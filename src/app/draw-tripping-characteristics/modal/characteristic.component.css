@@ -1,0 +1,40 @@
+
+.table thead th {
+  padding: 2px;
+  text-align: center;
+  vertical-align: middle;
+}
+.table tbody td{
+  vertical-align: middle;
+}
+
+table {
+  margin-top: 20px;
+}
+
+.th-action {
+  width: 65px;
+}
+
+.th-interval {
+  width: 70px;
+}
+
+.alert {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+#wrap-coordinate-panel-stratch {
+  position: relative;
+}
+
+#canvasBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#canvas {
+  position: relative;
+}

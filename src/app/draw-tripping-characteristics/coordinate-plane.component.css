@@ -1,0 +1,15 @@
+#wrap-coordinate-panel{
+  position: relative;
+  height:500px;
+  width:500px;
+  margin:0 auto;
+}
+
+#canvasBack{
+  position:absolute;
+  z-index:1;
+}
+#canvas{
+  position:relative;
+  z-index:2;
+}

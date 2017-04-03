@@ -1,0 +1,99 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div id="wrap-coordinate-panel">
+        <canvas height="500" width="500"
+                id="canvasBack"
+                #canvasBack></canvas>
+        <canvas height="500" width="500"
+                id="canvas"
+                #canvas></canvas>
+      </div>
+
+      <div id="setupcoordinate-panel">
+        <!--Set main workspace's config -->
+        <div class="form-group row">
+          <label for="scale" class="col-2 col-form-label">Масштаб</label>
+          <div class="col-2">
+            <input class="form-control" type="text" [(ngModel)]="config.scale" id="scale" (input)="rerender()">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="x0Offset" class="col-2 col-form-label">Смещение (x0)</label>
+          <div class="col-2">
+            <input class="form-control" type="text" [(ngModel)]="config.x0Offset" id="x0Offset" (input)="rerender()">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="y0Offset" class="col-2 col-form-label">Смещение (y0)</label>
+          <div class="col-2">
+            <input class="form-control" type="text" [(ngModel)]="config.y0Offset" id="y0Offset" (input)="rerender()">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="xStepGrid" class="col-2 col-form-label">Цена деления (X)</label>
+          <div class="col-2">
+            <input class="form-control" type="text" [(ngModel)]="config.xStepGrid" id="xStepGrid" (input)="rerender()">
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="yStepGrid" class="col-2 col-form-label">Цена деления (Y)</label>
+          <div class="col-2">
+            <input class="form-control" type="text" [(ngModel)]="config.yStepGrid" id="yStepGrid" (input)="rerender()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <button class="btn btn-primary" (click)="openModal(null)">Создать характеристику</button>
+
+      <div *ngIf="characteristics.length > 0">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Наименование</th>
+            <th>Цвет</th>
+            <th>Показать</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let characteristic of characteristics">
+            <td>{{characteristic.label}}</td>
+            <td><div style="width:15px;height:15px; border:1px solid #efefef;" [style.background] = "characteristic.color"></div></td>
+            <td><input type="checkbox" [(ngModel)]="characteristic.visable" (click)="changeVisable(characteristic)"/></td>
+            <td>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary btn-sm" (click)="openModal(characteristic)">
+                  &#9998;</button>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="deleteCharacteristic(characteristic)">
+                  &#10005;</button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-6">
+
+    </div>
+
+
+  </div>
+
+
+  <div class="col">
+
+
+  </div>
+</div>
+
+
+
