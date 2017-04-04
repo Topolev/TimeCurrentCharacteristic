@@ -1,5 +1,151 @@
 @import "custom-bootstrap";
 @import "custom-modals";
 
+/*fonts*/
+@font-face {
+  font-family: Oswald;
+  src: url("../fonts/Oswald-Regular.ttf");
+  font-style: normal;
+  font-weight: normal;
+  font-stretch: normal;
+}
+
+@font-face {
+  font-family: Oswald;
+  src: url("../fonts/Oswald-Bold.ttf");
+  font-style: normal;
+  font-weight: bold;
+  font-stretch: normal;
+}
+
+html{
+
+  height:100%;
+}
+body{
+  height: 100%;
+  font-family: Oswald;
+}
+
+
+//Navbar
+#wrap-navbar {
+  background: #444;
+}
+
+#logo img {
+  max-width: 50px;
+}
+
+#logo p {
+  display: inline-block;
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+#logo span {
+  color: #B9B9B9;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+#navbarSupportedContent ul.navbar-nav li a {
+  color: #fff;
+  text-transform: uppercase;
+}
+
+#navbarSupportedContent ul.navbar-nav li a:hover {
+  color: #B9B9B9;
+}
+
+.navbar-toggler {
+  border: none;
+  margin-top: 15px;
+}
+
+.navbar-toggler i {
+  font-size: 22px;
+  color: #fff;
+}
+
+
+//Main slider
+#wrap-slider {
+  height:100%;
+}
+
+#wrap-slider .carousel-item {
+  position:relative;
+
+}
+
+#wrap-slider .carousel-inner {
+  width: 100%;
+  height: 100%;
+  font-family: "Open Sans";
+}
+
+#wrap-slider .carousel-inner .carousel-item {
+  width: 100%;
+  height: 100%;
+  color:#fff;
+}
+
+#wrap-slider .image-slider{
+  width:100%;
+  height:100%;
+  background-size: cover;
+  background-position: center center;
+}
+
+#wrap-slider .back-item-slider{
+  position: absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+#wrap-slider .carousel-item .text-item-slider{
+  position: absolute;
+  left:-650px;
+  max-width:650px;
+  padding-top:10em;
+  transition-property: all;
+  transition-duration: 10s;
+}
+
+#wrap-slider .carousel-item.active .text-item-slider{
+  bottom:25%;
+  left:5%;
+  transition-property: all;
+  transition-duration: 10s;
+}
+
+#wrap-slider .text-item-slider h1{
+  font-weight: bold;
+  font-size: 3rem;
+}
+
+#wrap-slider .carousel-indicators{
+  bottom: 15%;
+}
+#wrap-slider .text-item-slider h1:after{
+  content: '';
+  display: block;
+  width:80px;
+  height: 6px;
+  background: #39c2d7;
+  margin:10px 0;
+}
+#wrap-slider .text-item-slider p{
+  line-height: 1.5rem;
+  font-size: 1.4rem;
+}
+
+
+
+//footer
 
 

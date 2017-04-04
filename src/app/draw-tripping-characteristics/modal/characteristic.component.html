@@ -61,6 +61,26 @@
         </tbody>
       </table>
 
+      <div>
+        <p>Учет разброса характеристик  <input type="checkbox" [(ngModel)]="characteristic.isSpread"></p>
+        <div class="form-group row" *ngIf="characteristic.isSpread">
+          <label class="col-3 col-form-label">Разброс вверх</label>
+          <div class="col-3">
+            <div class="input-group">
+              <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadPlus">
+              <span class="input-group-addon">%</span>
+            </div>
+          </div>
+          <label class="col-3 col-form-label">Разброс вниз</label>
+          <div class="col-3">
+            <div class="input-group">
+              <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadMinus">
+              <span class="input-group-addon">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
 
 

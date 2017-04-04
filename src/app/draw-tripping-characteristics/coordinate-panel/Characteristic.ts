@@ -6,9 +6,16 @@ export class Characteristic{
   color: string;
   areas: Area[];
   visable: boolean;
+  // voltage where is placed protection (relay protection, automatic circuit breaker)
+  ratioStep: number;
+  // characteristic spread, spread is measured in %
+  isSpread: boolean;
+  spreadPlus: number;
+  spreadMinus: number;
   constructor(){
     this.color = "#000000"
     this.areas = [];
     this.visable = true;
+    this.isSpread = false;
   }
 }

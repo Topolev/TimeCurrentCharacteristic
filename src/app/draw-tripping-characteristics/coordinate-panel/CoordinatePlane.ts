@@ -212,18 +212,6 @@ export default class CoordinatePlane {
       }
     }
 
-    /*var i = 0;
-    for (let graph of this.graphs) {
-      if (graph.type == 'EXPRESSION') {
-        let xOrigin = this.convertFactXIntoOrigin(x);
-        let yOrigin = graph.expression(xOrigin);
-        let yFact = this.yOriginToFact(yOrigin);
-        console.log(i++, xOrigin, yOrigin);
-        this.drawHorizontalLine(this.ctxMain, yFact, "red")
-        this.renderTextAndFillBackground(this.ctxMain, (yOrigin / 1 | 0).toString(), 10, yFact);
-        this.renderTextAndFillBackground(this.ctxMain, (xOrigin / 1 | 0).toString(), x, this.height - 35);
-      }
-    }*/
   }
 
   private renderTextAndFillBackground(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string = "yellow") {
@@ -247,7 +235,7 @@ export default class CoordinatePlane {
         for (let area of characteristic.areas) {
           switch (area.type) {
             case 1: {
-              lastPrevArea = this.drawExpressionCharacteristic(area, lastPrevArea, characteristic.color);
+              lastPrevArea = this.drawExpressionCharacteristic(characteristic, area, lastPrevArea, characteristic.color);
               break;
             }
             case 2: {
@@ -289,7 +277,7 @@ export default class CoordinatePlane {
     return new Point(+this.xOriginToFact(xRight), this.yOriginToFact(tsz))
   }
 
-  private drawExpressionCharacteristic(area: Area, prevPointArea: Point = null, color: string = '#000000', step: number = 1): Point {
+  private drawExpressionCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000', step: number = 1): Point {
 
     var xPrev: number = this.calcXStartForArea(area);
     var yPrev: number = +area.fn(xPrev);
@@ -300,6 +288,14 @@ export default class CoordinatePlane {
       utilCanvas.drawLine(this.ctxMain,
         +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev),
         this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step)), color);
+
+      //spread characteristic
+      if (characteristic.isSpread){
+        utilCanvas.drawLine(this.ctxMain,
+          +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev)*(1+characteristic.spreadPlus/100),
+          this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step))*(1+characteristic.spreadPlus)/100, color);
+      }
+
       xPrev = xPrev + step;
       yPrev = +area.fn(xPrev);
     }

@@ -12,36 +12,37 @@
 
       <div id="setupcoordinate-panel">
         <!--Set main workspace's config -->
+        <p>Настройка рабочей области</p>
         <div class="form-group row">
           <label for="scale" class="col-2 col-form-label">Масштаб</label>
           <div class="col-2">
             <input class="form-control" type="text" [(ngModel)]="config.scale" id="scale" (input)="rerender()">
           </div>
         </div>
-        <div class="form-group row">
-          <label for="x0Offset" class="col-2 col-form-label">Смещение (x0)</label>
-          <div class="col-2">
-            <input class="form-control" type="text" [(ngModel)]="config.x0Offset" id="x0Offset" (input)="rerender()">
+
+        <hr/>
+        <div class="form-group">
+          <label>Цена деления</label>
+          <div class="form-group row">
+            <label class="col-3 col-form-label">Ось тока (I)</label>
+            <div class="col-3">
+              <div class="input-group">
+                <input class="form-control" type="text"  [(ngModel)]="config.xStepGrid" (input)="rerender()">
+                <span class="input-group-addon">А</span>
+              </div>
+            </div>
+            <label class="col-4 col-form-label">Ось времени (t)</label>
+            <div class="col-2">
+              <div class="input-group">
+                <input class="form-control" type="text"  [(ngModel)]="config.yStepGrid" (input)="rerender()">
+                <span class="input-group-addon">c</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="form-group row">
-          <label for="y0Offset" class="col-2 col-form-label">Смещение (y0)</label>
-          <div class="col-2">
-            <input class="form-control" type="text" [(ngModel)]="config.y0Offset" id="y0Offset" (input)="rerender()">
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="xStepGrid" class="col-2 col-form-label">Цена деления (X)</label>
-          <div class="col-2">
-            <input class="form-control" type="text" [(ngModel)]="config.xStepGrid" id="xStepGrid" (input)="rerender()">
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="yStepGrid" class="col-2 col-form-label">Цена деления (Y)</label>
-          <div class="col-2">
-            <input class="form-control" type="text" [(ngModel)]="config.yStepGrid" id="yStepGrid" (input)="rerender()">
-          </div>
-        </div>
+        <hr/>
+
+
       </div>
     </div>
 
@@ -61,8 +62,12 @@
           <tbody>
           <tr *ngFor="let characteristic of characteristics">
             <td>{{characteristic.label}}</td>
-            <td><div style="width:15px;height:15px; border:1px solid #efefef;" [style.background] = "characteristic.color"></div></td>
-            <td><input type="checkbox" [(ngModel)]="characteristic.visable" (click)="changeVisable(characteristic)"/></td>
+            <td>
+              <div style="width:15px;height:15px; border:1px solid #efefef;"
+                   [style.background]="characteristic.color"></div>
+            </td>
+            <td><input type="checkbox" [(ngModel)]="characteristic.visable" (click)="changeVisable(characteristic)"/>
+            </td>
             <td>
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-secondary btn-sm" (click)="openModal(characteristic)">
