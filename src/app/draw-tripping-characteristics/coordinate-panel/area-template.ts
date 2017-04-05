@@ -1,3 +1,4 @@
+import Point from "./Point";
 export const enum TYPE_AREA  {
   POINTS,
   EXPRESSION,
@@ -17,9 +18,12 @@ export class Area {
   type: TYPE_AREA;
   label: string;
 
-  //Make sense only for ExpressionArea
+  //Make sense only for Expression and Independent
   variables?: Array<StringArray>;
   fn?: (x:number)=> number;
+
+  //Make sense only for Point
+  points?: Point[]
 
 }
 
@@ -43,6 +47,11 @@ export class AreaTemplate {
 
 
 export const defaultAreaTemplates: AreaTemplate[] = [
+  {
+    id: 0,
+    label: "По точкам",
+    type: TYPE_AREA.POINTS
+  },
   {
     id: 1,
     label: "Независимая",

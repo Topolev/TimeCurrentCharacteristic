@@ -8,11 +8,11 @@
   <div class="modal-body">
     <div class="form-group">
       <label>Наименование участка</label>
-      <input class="form-control" [(ngModel)] = "label">
+      <input class="form-control" [(ngModel)]="label">
     </div>
     <div class="form-group">
       <label>Тип характеристики</label>
-      <select class="form-control" [(ngModel)] = "selectedAreaTemplate" (change) = "buildArea()">
+      <select class="form-control" [(ngModel)]="selectedAreaTemplate" (change)="buildArea()">
         <option [ngValue]="null"></option>
         <option *ngFor="let areaTemplate of areaTemplates" [ngValue]="areaTemplate">{{areaTemplate.label}}</option>
       </select>
@@ -25,14 +25,14 @@
           <label class="col-2 col-form-label">начало</label>
           <div class="col-4">
             <div class="input-group">
-              <input type="text" class="form-control" [(ngModel)] ="currentArea.xStart">
+              <input type="text" class="form-control" [(ngModel)]="currentArea.xStart">
               <span class="input-group-addon" id="basic-addon2">А</span>
             </div>
           </div>
           <label class="col-2 col-form-label">конец</label>
           <div class="col-4">
             <div class="input-group">
-              <input type="text" class="form-control" [(ngModel)] ="currentArea.xEnd">
+              <input type="text" class="form-control" [(ngModel)]="currentArea.xEnd">
               <span class="input-group-addon">А</span>
             </div>
           </div>
@@ -43,7 +43,25 @@
 
       <!-- 0 equal to POINTS-->
       <div *ngIf="currentArea.type == 0">
-        POINTS
+        <button (click) = "addPoint()">Добавить точку</button>
+        <table>
+          <thead>
+          <tr>
+            <th>I, А</th>
+            <th>t, c</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let point of currentArea.points">
+            <td><input type="text" [(ngModel)] = "point.x"/></td>
+            <td><input type="text" [(ngModel)] = "point.y"/></td>
+            <td>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="deletePoint(point)">&#10005;</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
       <!-- 1 equal to EXPRESSION or INDEPENDENT-->
       <div *ngIf="currentArea.type == 1 ||currentArea.type == 2 ">
@@ -51,10 +69,10 @@
         <div class="form-group">
           <label>Параметры характеристики</label>
           <div class="form-group row"
-            *ngFor = "let variableDesc of currentArea.areaTemplate.variableDescriptions">
+               *ngFor="let variableDesc of currentArea.areaTemplate.variableDescriptions">
             <label class="col-4 col-form-label">{{variableDesc.labelForUser}}</label>
             <div class="col-8">
-              <input class="form-control" type="text" [(ngModel)] = "currentArea.variables[variableDesc.label]">
+              <input class="form-control" type="text" [(ngModel)]="currentArea.variables[variableDesc.label]">
             </div>
           </div>
         </div>
@@ -62,10 +80,6 @@
       </div>
 
     </div>
-
-
-
-
 
 
   </div>

@@ -1,0 +1,59 @@
+.wrap-tools{
+  margin-top:15px;
+  font-family: "Open Sans";
+}
+.data-publication{
+  color:#999;
+  margin-bottom: 5px;
+  display:block;
+  font-size: 0.9rem;
+}
+.wrap-tool{
+  padding:15px;
+  border-top:1px solid #e2e2e2;
+  border-bottom: 1px solid #e2e2e2;
+}
+.wrap-tool .name-tool{
+  color:#000000;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 10px 0;
+  display: block;
+
+}
+.wrap-tool:hover{
+  background: #f6f8f9;
+}
+
+.wrap-labels{
+  font-size: 0.9rem;
+  color:#999;
+}
+.wrap-labels a {
+  display: inline-block;
+  padding:5px 2px;
+  cursor: pointer;
+}
+.wrap-labels a:hover{
+  text-decoration: underline;
+}
+
+
+.author{
+  display:inline-flex;
+  align-items:center;
+  padding-right:10px;
+}
+.author img{
+  width:45px;
+  border-radius: 50%;
+}
+.author-description{
+  padding:0 0 0 5px;
+}
+.author-description p{
+  margin:5px;
+}
+.author-description a{
+  color:#39c2d7;
+}

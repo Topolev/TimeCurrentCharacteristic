@@ -1,4 +1,4 @@
-import Point from "./point";
+import Point from "./Point";
 
 
 export function clearCanvas(ctx: CanvasRenderingContext2D, width:number, height:number): void {

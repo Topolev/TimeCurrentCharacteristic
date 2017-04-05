@@ -4,6 +4,7 @@ import {NgbModal, ModalDismissReasons, NgbModalRef} from '@ng-bootstrap/ng-boots
 import {AreaTemplate, defaultAreaTemplates, Area} from "../coordinate-panel/area-template";
 import {Builder} from "selenium-webdriver";
 import {BuilderArea} from "../coordinate-panel/area-builder";
+import Point from "../coordinate-panel/Point";
 
 @Component({
   selector: 'create-new-area-modal',
@@ -40,6 +41,14 @@ export class CreateNewArea {
       if (areaTemplate.id === id) return areaTemplate;
     }
     return null;
+  }
+
+  addPoint(){
+    console.log("add point");
+    this.currentArea.points.push(new Point())
+  }
+  deletePoint(point:Point){
+    this.currentArea.points.splice(this.currentArea.points.indexOf(point),1);
   }
 
   open(area: Area) {

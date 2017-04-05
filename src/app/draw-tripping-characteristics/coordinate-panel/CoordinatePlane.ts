@@ -1,7 +1,7 @@
 /**
  * Created by Vladimir on 22.03.2017.
  */
-import Point from "./point";
+import Point from "./Point";
 import * as utilCanvas from "./util-canvas";
 import {Injectable} from "@angular/core";
 import {ConfigCoordinatePanel, defaultConfig} from "./ConfigCoordinatePanel";
@@ -134,12 +134,12 @@ export default class CoordinatePlane {
   }
 
   private drawItermidiateYAxises() {
-    var totalAxis = (this.height - 2 * this.config.marginVertical) / (this.config.scale * this.config.scaleYInit* this.config.yStepGrid);
+    var totalAxis = (this.height - 2 * this.config.marginVertical) / (this.config.scale * this.config.scaleYInit * this.config.yStepGrid);
     var intervalBetweenText = Math.ceil(totalAxis / this.config.maxNumberWithinY);
 
-    var countAxisesBeforeY0 = (this.config.y0Offset  / this.config.yStepGrid) | 0;
-    var startY0 = this.height - (this.config.marginVertical + this.config.y0Offset * this.config.scale*this.config.scaleYInit - countAxisesBeforeY0 * this.config.yStepGrid * this.config.scale*this.config.scaleYInit);
-    for (var y = startY0, i = 0; y > this.config.marginVertical; y -= this.config.yStepGrid * this.config.scale*this.config.scaleYInit, i++) {
+    var countAxisesBeforeY0 = (this.config.y0Offset / this.config.yStepGrid) | 0;
+    var startY0 = this.height - (this.config.marginVertical + this.config.y0Offset * this.config.scale * this.config.scaleYInit - countAxisesBeforeY0 * this.config.yStepGrid * this.config.scale * this.config.scaleYInit);
+    for (var y = startY0, i = 0; y > this.config.marginVertical; y -= this.config.yStepGrid * this.config.scale * this.config.scaleYInit, i++) {
       this.drawHorizontalLine(this.ctxBack, y, this.config.colorIntermediateAxis);
       if (i % intervalBetweenText == 0) {
         var text = (-(countAxisesBeforeY0--) * this.config.yStepGrid).toFixed(2).toString();
@@ -190,18 +190,21 @@ export default class CoordinatePlane {
 
         for (let area of characteristic.areas) {
           switch (area.type) {
+            case 0: {
+              this.drawHorizonalLineForPoints(+xOrigin, area);
+              break;
+            }
             case 1: {
               let yOrigin = area.fn(xOrigin);
-              let yFact =  this.yOriginToFact(yOrigin);
-              console.log("1",yOrigin,yFact);
+              let yFact = this.yOriginToFact(yOrigin);
               this.drawHorizontalLine(this.ctxMain, yFact, "red");
               this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
               break;
             }
             case 2: {
               let yOrigin = +area.fn(xOrigin);
-              let yFact =  this.yOriginToFact(yOrigin);
-              if (xOrigin > +area.variables['Isz']){
+              let yFact = this.yOriginToFact(yOrigin);
+              if (xOrigin > +area.variables['Isz']) {
                 this.drawHorizontalLine(this.ctxMain, yFact, "red");
                 this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
               }
@@ -212,6 +215,32 @@ export default class CoordinatePlane {
       }
     }
 
+  }
+
+  private drawHorizonalLineForPoints(xOrigin:number, area:Area){
+    if ((+area.points[0].x < xOrigin) && (+area.points[area.points.length-1].x > xOrigin)){
+
+      var prevPoint = area.points[0];
+      var i = 0;
+      while(prevPoint.x < xOrigin && i< area.points.length){
+        prevPoint = area.points[++i];
+      }
+
+      var fn = this.approximationByLine(area.points[i-1], prevPoint);
+      let yOrigin = fn(xOrigin);
+      let yFact = this.yOriginToFact(yOrigin);
+      this.drawHorizontalLine(this.ctxMain, yFact, "red");
+      this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
+    }
+
+  }
+
+  approximationByLine(point1: Point, point2: Point): (x:number) => number{
+    var x1 = +point1.x, y1 = +point1.y;
+    var x2 = +point2.x, y2 = +point2.y;
+    var k = (y2-y1)/(x2-x1);
+    var b = (y1*x2 - x1*y2)/(x2-x1);
+    return (x) => k*x + b;
   }
 
   private renderTextAndFillBackground(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string = "yellow") {
@@ -234,6 +263,10 @@ export default class CoordinatePlane {
         var lastPrevArea: Point = null;
         for (let area of characteristic.areas) {
           switch (area.type) {
+            case 0: {
+              lastPrevArea = this.drawPointsCharacteristic(characteristic, area, lastPrevArea, characteristic.color);
+              break;
+            }
             case 1: {
               lastPrevArea = this.drawExpressionCharacteristic(characteristic, area, lastPrevArea, characteristic.color);
               break;
@@ -290,11 +323,11 @@ export default class CoordinatePlane {
         this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step)), color);
 
       //spread characteristic
-      if (characteristic.isSpread){
-        utilCanvas.drawLine(this.ctxMain,
-          +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev)*(1+characteristic.spreadPlus/100),
-          this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step))*(1+characteristic.spreadPlus)/100, color);
-      }
+      /*if (characteristic.isSpread){
+       utilCanvas.drawLine(this.ctxMain,
+       +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev)*(1+characteristic.spreadPlus/100),
+       this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step))*(1+characteristic.spreadPlus)/100, color);
+       }*/
 
       xPrev = xPrev + step;
       yPrev = +area.fn(xPrev);
@@ -302,17 +335,16 @@ export default class CoordinatePlane {
     return new Point(xPrev, yPrev);
   }
 
-  private drawExpressionGraph(func: (x: number) => number, step: number = 1) {
-    var xPrev: number = -this.config.x0Offset;
-    var yPrev: number = func(xPrev);
-    var xEnd = (this.width - 2 * this.config.marginHorizontal) / this.config.scale - this.config.x0Offset;
-    for (let i = xPrev + step; i < xEnd; i += step) {
+  private drawPointsCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
+    console.log("draw points")
+    var pointPrev = area.points[0];
+    for (var i = 1; i < area.points.length; i++) {
       utilCanvas.drawLine(this.ctxMain,
-        this.xOriginToFact(xPrev), this.yOriginToFact(yPrev),
-        this.xOriginToFact(xPrev + step), this.yOriginToFact(func(xPrev + step)));
-      xPrev = xPrev + step;
-      yPrev = func(xPrev);
+        this.xOriginToFact(+pointPrev.x), this.yOriginToFact(+pointPrev.y),
+        this.xOriginToFact(+area.points[i].x), this.yOriginToFact(+area.points[i].y), characteristic.color);
+      pointPrev = area.points[i];
     }
+    return pointPrev;
   }
 
 
@@ -322,16 +354,16 @@ export default class CoordinatePlane {
 
 
   private xOriginToFact(xOrigin: number) {
-    return this.config.marginHorizontal + (xOrigin + this.config.x0Offset) * this.config.scale*this.config.scaleXInit;
+    return this.config.marginHorizontal + (xOrigin + this.config.x0Offset) * this.config.scale * this.config.scaleXInit;
   }
 
   private yOriginToFact(yOrigin: number) {
-    return this.height - this.config.marginVertical - (yOrigin + this.config.y0Offset) * this.config.scale*this.config.scaleYInit;
+    return this.height - this.config.marginVertical - (yOrigin + this.config.y0Offset) * this.config.scale * this.config.scaleYInit;
   }
 
 
   private convertFactXIntoOrigin(xFact: number) {
-    return (xFact - this.config.marginHorizontal) / (this.config.scale*this.config.scaleXInit) - this.config.x0Offset;
+    return (xFact - this.config.marginHorizontal) / (this.config.scale * this.config.scaleXInit) - this.config.x0Offset;
   }
 
   private isYOnWorkspace(yOrigin: number) {
