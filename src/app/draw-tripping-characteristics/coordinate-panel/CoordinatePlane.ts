@@ -323,11 +323,11 @@ export default class CoordinatePlane {
         this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step)), color);
 
       //spread characteristic
-      /*if (characteristic.isSpread){
+      if (characteristic.isSpread){
        utilCanvas.drawLine(this.ctxMain,
        +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev)*(1+characteristic.spreadPlus/100),
        this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step))*(1+characteristic.spreadPlus)/100, color);
-       }*/
+       }
 
       xPrev = xPrev + step;
       yPrev = +area.fn(xPrev);

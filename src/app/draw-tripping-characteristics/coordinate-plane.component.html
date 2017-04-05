@@ -61,7 +61,7 @@
           </thead>
           <tbody>
           <tr *ngFor="let characteristic of characteristics">
-            <td>{{characteristic.label}}</td>
+            <td>{{characteristic.label == undefined || characteristic.label.trim() ==''? 'без имени': characteristic.label }}</td>
             <td>
               <div style="width:15px;height:15px; border:1px solid #efefef;"
                    [style.background]="characteristic.color"></div>

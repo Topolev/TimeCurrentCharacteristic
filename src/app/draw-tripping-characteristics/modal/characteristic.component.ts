@@ -7,6 +7,7 @@ import {ConfigCoordinatePanel, defaultConfig} from "../coordinate-panel/ConfigCo
 import {CharacteristicService} from "./characteristic.service";
 import {subscribeOn} from "rxjs/operator/subscribeOn";
 import {Characteristic} from "../coordinate-panel/Characteristic";
+declare var jQuery: any;
 
 @Component({
   selector: 'ngbd-modal-basic',
@@ -70,7 +71,9 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
   private createNewArea(area: Area) {
     this.characteristic.areas.push(area);
     this.grid.updateAllCharacteristic([this.characteristic]);
+    //jQuery('body').addClass('modal-open');
   }
+
 
 
   private editExistArea(editArea: Area) {
@@ -82,6 +85,7 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
       }
     }
     this.grid.updateAllCharacteristic([this.characteristic]);
+    //jQuery('body').addClass('modal-open');
   }
 
 

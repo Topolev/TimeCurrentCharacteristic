@@ -9,6 +9,7 @@ export class BuilderArea {
     area.type = areaTemplate.type;
     if (area.type == 0){
       area.points = [];
+      area.pointsTemplate = null;
     }
     if (area.type == 1 || area.type == 2) {
       area.fn = areaTemplate.fn;

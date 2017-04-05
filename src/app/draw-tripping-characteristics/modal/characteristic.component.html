@@ -41,7 +41,7 @@
         </thead>
         <tbody>
         <tr *ngFor="let area of characteristic.areas">
-          <td>{{area.label}}</td>
+          <td>{{area.label == undefined || area.label.trim() == ''? 'без имени': area.label}}</td>
           <td>{{area.areaTemplate.label}}</td>
           <td>
             <span *ngIf="area.xStart == undefined || area.xStart.trim() == ''">-&#x221E;</span>

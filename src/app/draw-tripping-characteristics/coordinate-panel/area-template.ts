@@ -1,4 +1,5 @@
 import Point from "./Point";
+import {PointsTemplate} from "./PointsTemplate";
 export const enum TYPE_AREA  {
   POINTS,
   EXPRESSION,
@@ -12,6 +13,7 @@ export interface StringArray {
 export class Area {
   id:number;
   areaTemplate: AreaTemplate;
+  pointsTemplate: PointsTemplate;
 
   xStart: number = 0;
   xEnd: number = 0;

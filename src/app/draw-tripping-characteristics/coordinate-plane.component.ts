@@ -4,9 +4,7 @@
 
 import {Component, ElementRef, OnInit, ViewChild, AfterViewInit} from "@angular/core";
 import CoordinatePlane from "./coordinate-panel/CoordinatePlane";
-import Graph from "./coordinate-panel/graph";
 import {ConfigCoordinatePanel, defaultConfig} from "./coordinate-panel/ConfigCoordinatePanel";
-import {DialogService} from "ng2-bootstrap-modal";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CharacteristicComponent} from "./modal/characteristic.component";
 import {CharacteristicService} from "./modal/characteristic.service";

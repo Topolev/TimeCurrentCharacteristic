@@ -4,7 +4,7 @@ import {CoordinatePlaneComponent} from "./coordinate-plane.component";
 import {FormsModule} from "@angular/forms";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {CharacteristicComponent} from "./modal/characteristic.component";
-import {CreateNewArea} from "./modal/create-new-area";
+import {CreateNewArea} from "./modal/area.component";
 import {CharacteristicService} from "./modal/characteristic.service";
 
 

@@ -5,16 +5,25 @@ import {AreaTemplate, defaultAreaTemplates, Area} from "../coordinate-panel/area
 import {Builder} from "selenium-webdriver";
 import {BuilderArea} from "../coordinate-panel/area-builder";
 import Point from "../coordinate-panel/Point";
+import {PointsTemplate, defaultPointsTemplate} from "../coordinate-panel/PointsTemplate";
+declare var jQuery: any;
 
 @Component({
   selector: 'create-new-area-modal',
-  templateUrl: './create-new-area.html'
+  templateUrl: './area.component.html',
+  styleUrls: ['./area.component.css']
 })
 export class CreateNewArea {
 
-  builder: BuilderArea;
+  builderArea: BuilderArea;
+
   selectedAreaTemplate: AreaTemplate;
+  selectedPointsTemplate: PointsTemplate = null;
+
   areaTemplates: AreaTemplate[];
+  pointsTemplates: PointsTemplate[];
+
+
   currentArea: Area;
   isEditMode: boolean = false;
   idArea:number;
@@ -28,12 +37,22 @@ export class CreateNewArea {
   constructor(
     private modalService: NgbModal) {
     this.areaTemplates = defaultAreaTemplates;
-    this.builder = new BuilderArea();
+    this.pointsTemplates = defaultPointsTemplate;
+
+    this.builderArea = new BuilderArea();
   }
 
   buildArea() {
-    this.currentArea = this.builder.buildAreaByTemplate(this.selectedAreaTemplate);
+    this.currentArea = this.builderArea.buildAreaByTemplate(this.selectedAreaTemplate);
     this.currentArea.id = this.idArea;
+  }
+
+  buildPointsTemplate(){
+    if (this.selectedPointsTemplate !=null) {
+      this.currentArea.points = this.selectedPointsTemplate.points.map(point => new Point(point.x, point.y));
+    } else{
+      this.currentArea.points = [];
+    }
   }
 
   findAreaTemplateById(id: number): AreaTemplate {
@@ -58,6 +77,7 @@ export class CreateNewArea {
       this.idArea = area.id;
       this.currentArea = area;
       this.selectedAreaTemplate = area.areaTemplate;
+      this.selectedPointsTemplate = area.pointsTemplate;
     } else {
       this.idArea = Date.now();
       this.isEditMode = false;
@@ -65,6 +85,7 @@ export class CreateNewArea {
     this.modalService.open(this.content).result.then(() => {
       this.currentArea.label = this.label;
       this.currentArea.areaTemplate = this.selectedAreaTemplate;
+      this.currentArea.pointsTemplate = this.selectedPointsTemplate;
       if (this.isEditMode) {
         this.onEditArea.emit(this.currentArea);
       } else {
@@ -73,7 +94,9 @@ export class CreateNewArea {
       this.selectedAreaTemplate = null;
       this.label = "";
       this.currentArea = null;
+      jQuery('body').addClass('modal-open');
     }, () => {
+      jQuery('body').addClass('modal-open');
     });
   }
 
