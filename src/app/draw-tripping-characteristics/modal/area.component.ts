@@ -91,13 +91,17 @@ export class CreateNewArea {
       } else {
         this.onNewArea.emit(this.currentArea);
       }
-      this.selectedAreaTemplate = null;
-      this.label = "";
-      this.currentArea = null;
-      jQuery('body').addClass('modal-open');
+      this.clearAllData();
     }, () => {
-      jQuery('body').addClass('modal-open');
+      this.clearAllData();
     });
+  }
+
+  clearAllData(){
+    this.selectedAreaTemplate = null;
+    this.label = "";
+    this.currentArea = null;
+    jQuery('body').addClass('modal-open');
   }
 
 

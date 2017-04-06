@@ -108,8 +108,20 @@ export default class CoordinatePlane {
   }
 
   private drawMainAxises() {
-    this.drawVerticalLine(this.ctxBack, this.xOriginToFact(0), this.config.colorMainAxis);
-    this.drawHorizontalLine(this.ctxBack, this.yOriginToFact(0), this.config.colorMainAxis);
+    this.ctxBack.font = "14px Arial";
+
+    var x0 = this.xOriginToFact(0);
+    utilCanvas.drawLine(this.ctxBack, x0, 10, x0+2, 25);
+    utilCanvas.drawLine(this.ctxBack, x0, 10, x0-2, 25);
+    utilCanvas.drawLine(this.ctxBack, x0, 10, x0, this.height - this.config.marginVertical, '#000000');
+    this.ctxBack.fillText("I, A", this.width - this.config.marginVertical + 15, this.height - this.config.marginVertical + 30);
+
+    var y0 = this.yOriginToFact(0);
+    utilCanvas.drawLine(this.ctxBack, this.config.marginHorizontal, y0, this.width - 5, y0, '#000000');
+    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0-2);
+    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0+2);
+    this.ctxBack.fillText("t, c", 10, 25);
+
   }
 
   private drawIntermidiateXAxises() {
