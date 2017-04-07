@@ -7,6 +7,7 @@ import {Injectable} from "@angular/core";
 import {ConfigCoordinatePanel, defaultConfig} from "./ConfigCoordinatePanel";
 import {Area} from "./area-template";
 import {Characteristic} from "./Characteristic";
+import {CurrentSlice} from "./CurrentSlice";
 
 @Injectable()
 export default class CoordinatePlane {
@@ -30,6 +31,7 @@ export default class CoordinatePlane {
   private height: number;
 
   private characteristics: Array<Characteristic> = [];
+  private currentSlices: Array<CurrentSlice> = [];
 
 
   /**
@@ -69,6 +71,12 @@ export default class CoordinatePlane {
     this.render();
   }
 
+  public addCurrentSlices(currentSlices: Array<CurrentSlice>) {
+    console.log(currentSlices);
+    this.currentSlices = currentSlices;
+    this.render();
+  }
+
   public addCharacteristics(characteristics: Characteristic[]) {
     this.characteristics = characteristics;
     this.render();
@@ -91,7 +99,6 @@ export default class CoordinatePlane {
     ctx.clearRect(0, 0, this.width, this.height);
   }
 
-
   private drawVerticalLine(ctx: CanvasRenderingContext2D, x: number, color: string = "#000000") {
     utilCanvas.drawLine(ctx, x, this.config.marginVertical, x, this.height - this.config.marginVertical, color);
   }
@@ -111,17 +118,16 @@ export default class CoordinatePlane {
     this.ctxBack.font = "14px Arial";
 
     var x0 = this.xOriginToFact(0);
-    utilCanvas.drawLine(this.ctxBack, x0, 10, x0+2, 25);
-    utilCanvas.drawLine(this.ctxBack, x0, 10, x0-2, 25);
+    utilCanvas.drawLine(this.ctxBack, x0, 10, x0 + 2, 25);
+    utilCanvas.drawLine(this.ctxBack, x0, 10, x0 - 2, 25);
     utilCanvas.drawLine(this.ctxBack, x0, 10, x0, this.height - this.config.marginVertical, '#000000');
     this.ctxBack.fillText("I, A", this.width - this.config.marginVertical + 15, this.height - this.config.marginVertical + 30);
 
     var y0 = this.yOriginToFact(0);
     utilCanvas.drawLine(this.ctxBack, this.config.marginHorizontal, y0, this.width - 5, y0, '#000000');
-    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0-2);
-    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0+2);
+    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0 - 2);
+    utilCanvas.drawLine(this.ctxBack, this.width - 5, y0, this.width - 20, y0 + 2);
     this.ctxBack.fillText("t, c", 10, 25);
-
   }
 
   private drawIntermidiateXAxises() {
@@ -184,75 +190,119 @@ export default class CoordinatePlane {
 
   public mouseOver = (ev: MouseEvent) => {
     var currentX = ev.offsetX;
-
     this.render();
-
     if ((currentX > this.config.marginHorizontal) && (currentX < (this.width - this.config.marginHorizontal))) {
-      this.drawVerticalLine(this.ctxMain, currentX, "red");
-      this.renderTextAndFillBackground(this.ctxMain, (this.convertFactXIntoOrigin(currentX) / 1 | 0).toString(), currentX, this.height - 20);
-      this.drawHorizontalLineForExpressionGraph(currentX);
+      var xOrigin = this.xFactToOrigin(currentX);
+      this.drawCurrentSlicesForCharacterisic([new CurrentSlice(+xOrigin.toFixed(2))]);
     }
 
   }
 
-  private drawHorizontalLineForExpressionGraph(x: number) {
-    var xOrigin = this.convertFactXIntoOrigin(x);
+  private drawCurrentSlicesForCharacterisic(currentSlices: Array<CurrentSlice>) {
+    console.log("drawCurrentSLices")
+
+    //Draw horizonal slice
     for (let characteristic of this.characteristics) {
       if (characteristic.visable) {
-
         for (let area of characteristic.areas) {
-          switch (area.type) {
-            case 0: {
-              this.drawHorizonalLineForPoints(+xOrigin, area);
-              break;
-            }
-            case 1: {
-              let yOrigin = area.fn(xOrigin);
-              let yFact = this.yOriginToFact(yOrigin);
-              this.drawHorizontalLine(this.ctxMain, yFact, "red");
-              this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
-              break;
-            }
-            case 2: {
-              let yOrigin = +area.fn(xOrigin);
-              let yFact = this.yOriginToFact(yOrigin);
-              if (xOrigin > +area.variables['Isz']) {
-                this.drawHorizontalLine(this.ctxMain, yFact, "red");
-                this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
-              }
-              break;
+          for (let currentSlice of currentSlices) {
+            if (currentSlice.current) {
+              var xFact = this.xOriginToFact(+currentSlice.current);
+              this.drawHorizontalLineForArea(xFact, characteristic, area);
             }
           }
         }
       }
     }
-
+    //Draw vertical slice
+    currentSlices.filter(
+      currentSlice => currentSlice.current
+    ).map(currentSlice => {
+      let xFact = this.xOriginToFact(+currentSlice.current);
+      this.drawLineDash(this.ctxMain, xFact, this.config.marginVertical, xFact, this.height - this.config.marginVertical)
+      this.renderTextAndFillBackground(this.ctxMain, currentSlice.current.toString(), xFact, 30);
+    });
   }
 
-  private drawHorizonalLineForPoints(xOrigin:number, area:Area){
-    if ((+area.points[0].x < xOrigin) && (+area.points[area.points.length-1].x > xOrigin)){
+  private drawHorizontalLineForArea(x: number, characterictic: Characteristic, area: Area) {
+    switch (area.type) {
+      case 0: {
+        this.drawHorizonalLineForPoints(+x,characterictic, area);
+        break;
+      }
+      case 1: {
+        this.drawHorizonalLineForExpression(+x, characterictic, area);
+        break;
+      }
+      case 2: {
+        this.drawHorizontalLineForIndependent(+x, characterictic, area);
+        break;
+      }
+    }
+  }
 
+
+  private drawHorizontalLineForIndependent(xFact: number,characteristic: Characteristic, area: Area) {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var xOrigin = this.xFactToOrigin(xFact);
+    let yOrigin = +area.fn(xOrigin);
+    if (xOrigin/iBase > +area.variables['Isz']) {
+      this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
+    }
+  }
+
+  private drawHorizonalLineForPoints(xFact: number, characteristic: Characteristic, area: Area) {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var xOrigin = this.xFactToOrigin(xFact);
+    if ((+area.points[0].x < xOrigin/iBase) && (+area.points[area.points.length - 1].x > xOrigin/iBase)) {
       var prevPoint = area.points[0];
       var i = 0;
-      while(prevPoint.x < xOrigin && i< area.points.length){
+      while (prevPoint.x < xOrigin/iBase && i < area.points.length) {
         prevPoint = area.points[++i];
       }
 
-      var fn = this.approximationByLine(area.points[i-1], prevPoint);
-      let yOrigin = fn(xOrigin);
-      let yFact = this.yOriginToFact(yOrigin);
-      this.drawHorizontalLine(this.ctxMain, yFact, "red");
-      this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), 10, yFact);
+      var fn = this.approximationByLine(area.points[i - 1], prevPoint);
+      let yOrigin = fn(xOrigin/iBase);
+      this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
     }
-
   }
 
-  approximationByLine(point1: Point, point2: Point): (x:number) => number{
-    var x1 = +point1.x, y1 = +point1.y;
-    var x2 = +point2.x, y2 = +point2.y;
-    var k = (y2-y1)/(x2-x1);
-    var b = (y1*x2 - x1*y2)/(x2-x1);
-    return (x) => k*x + b;
+  private drawHorizonalLineForExpression(xFact: number, characteristic: Characteristic, area: Area) {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var xOrigin = this.xFactToOrigin(xFact);
+    let yOrigin = area.fn(xOrigin/iBase);
+    this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
+  }
+
+  /*Draw line which is coming via point (xOrigin, yOrigin)*/
+  private drawHorizontalLineFromXOriginToEndWorkspace(xOrigin: number, yOrigin: number) {
+    let yFact = this.yOriginToFact(yOrigin);
+    let xFact = this.xOriginToFact(xOrigin);
+    if (this.isYFactOnWorkspace(yFact)) {
+      this.drawLineDash(this.ctxMain, xFact, yFact, this.width - this.config.marginHorizontal, yFact);
+      this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), this.width - this.config.marginHorizontal + 5, yFact);
+    }
+  }
+
+
+
+  private drawLineDash(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string = "red") {
+    ctx.setLineDash([5, 3]);
+    /*dashes are 5px and spaces are 3px*/
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([1, 0]);
+  }
+
+
+  approximationByLine(point1: Point, point2: Point): (x: number) => number {
+    let x1 = +point1.x, y1 = +point1.y;
+    let x2 = +point2.x, y2 = +point2.y;
+    let k = (y2 - y1) / (x2 - x1);
+    let b = (y1 * x2 - x1 * y2) / (x2 - x1);
+    return (x) => k * x + b;
   }
 
   private renderTextAndFillBackground(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string = "yellow") {
@@ -262,7 +312,6 @@ export default class CoordinatePlane {
     ctx.fillRect(x - 3, y + 5, widthText + 3, -20);
     ctx.fillStyle = 'blue';
     ctx.fillText(text, x, y);
-    console.log("render:", text)
   }
 
   public render(config: ConfigCoordinatePanel = this.config) {
@@ -284,7 +333,7 @@ export default class CoordinatePlane {
               break;
             }
             case 2: {
-              lastPrevArea = this.drawIndependentCharacteristic(area, lastPrevArea, characteristic.color);
+              lastPrevArea = this.drawIndependentCharacteristic(characteristic, area, lastPrevArea, characteristic.color);
               break;
             }
           }
@@ -294,15 +343,23 @@ export default class CoordinatePlane {
     this.ctxMain.clearRect(0, 0, this.width, this.config.marginVertical);
     this.ctxMain.clearRect(0, this.height - this.config.marginVertical, this.width, this.config.marginVertical);
 
+
+    //Create current slices
+    this.drawCurrentSlicesForCharacterisic(this.currentSlices);
+
   }
 
-  private calcXStartForArea(area: Area): number {
-    return (!!!area.xStart && String(area.xStart).trim() != '' && area.xStart > -this.config.x0Offset) ? +area.xStart : -this.config.x0Offset;
+  private calcXStartForArea(characteristic: Characteristic, area: Area): number {
+    var uBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
+
+    return (!!!area.xStart && String(area.xStart).trim() != '' && area.xStart*uBase > -this.config.x0Offset) ? +area.xStart : -this.config.x0Offset;
   }
 
-  private drawIndependentCharacteristic(area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
+  private drawIndependentCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+
     var tsz = +area.variables['tsz'];
-    var Isz = +area.variables['Isz'];
+    var Isz = +area.variables['Isz']*iBase;
 
     var yTopWorkspace = (this.height - 2 * this.config.marginVertical) / this.config.scale - this.config.y0Offset;
     var yTop = prevPointArea ? prevPointArea.y : yTopWorkspace;
@@ -323,23 +380,17 @@ export default class CoordinatePlane {
   }
 
   private drawExpressionCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000', step: number = 1): Point {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
 
-    var xPrev: number = this.calcXStartForArea(area);
+    var xPrev: number = this.calcXStartForArea(characteristic, area);
     var yPrev: number = +area.fn(xPrev);
 
     var xEndWorkspace = (this.width - 2 * this.config.marginHorizontal) / this.config.scale - this.config.x0Offset;
     var xEnd: number = (area.xEnd != null && area.xEnd < xEndWorkspace) ? area.xEnd : xEndWorkspace;
-    for (let i = xPrev + step; i < xEnd; i += step) {
+    for (let i = xPrev + step; i*iBase < xEnd; i += step) {
       utilCanvas.drawLine(this.ctxMain,
-        +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev),
-        this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step)), color);
-
-      //spread characteristic
-      if (characteristic.isSpread){
-       utilCanvas.drawLine(this.ctxMain,
-       +this.xOriginToFact(xPrev), this.yOriginToFact(yPrev)*(1+characteristic.spreadPlus/100),
-       this.xOriginToFact(xPrev + step), this.yOriginToFact(+area.fn(xPrev + step))*(1+characteristic.spreadPlus)/100, color);
-       }
+        +this.xOriginToFact(xPrev*iBase), this.yOriginToFact(yPrev),
+        this.xOriginToFact((xPrev + step)*iBase), this.yOriginToFact(+area.fn(xPrev + step)), color);
 
       xPrev = xPrev + step;
       yPrev = +area.fn(xPrev);
@@ -348,12 +399,13 @@ export default class CoordinatePlane {
   }
 
   private drawPointsCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
-    console.log("draw points")
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+
     var pointPrev = area.points[0];
     for (var i = 1; i < area.points.length; i++) {
       utilCanvas.drawLine(this.ctxMain,
-        this.xOriginToFact(+pointPrev.x), this.yOriginToFact(+pointPrev.y),
-        this.xOriginToFact(+area.points[i].x), this.yOriginToFact(+area.points[i].y), characteristic.color);
+        this.xOriginToFact(+pointPrev.x * iBase), this.yOriginToFact(+pointPrev.y),
+        this.xOriginToFact(+area.points[i].x *iBase), this.yOriginToFact(+area.points[i].y), characteristic.color);
       pointPrev = area.points[i];
     }
     return pointPrev;
@@ -374,12 +426,16 @@ export default class CoordinatePlane {
   }
 
 
-  private convertFactXIntoOrigin(xFact: number) {
+  private xFactToOrigin(xFact: number) {
     return (xFact - this.config.marginHorizontal) / (this.config.scale * this.config.scaleXInit) - this.config.x0Offset;
   }
 
-  private isYOnWorkspace(yOrigin: number) {
+  private isYOriginOnWorkspace(yOrigin: number) {
     return true;
+  }
+
+  private isYFactOnWorkspace(yFact: number): boolean {
+    return (yFact < (this.height - this.config.marginVertical)) && (yFact > this.config.marginVertical);
   }
 
 

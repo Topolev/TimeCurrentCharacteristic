@@ -1,3 +1,7 @@
+
+.font-arial{
+  font-family: "Arial";
+}
 #wrap-coordinate-panel{
   position: relative;
   height:500px;
@@ -13,3 +17,24 @@
   position:relative;
   z-index:2;
 }
+
+
+.block-parameters{
+  margin:10px 0;
+  border: 1px solid #e2e2e2;
+}
+.block-parameters h1{
+  font-size:20px;
+  padding: 10px;
+  background: #39c2d7;
+  color:#fff;
+}
+
+.wrap{
+  margin:10px;
+}
+
+.table{
+  background: #fff;
+}
+

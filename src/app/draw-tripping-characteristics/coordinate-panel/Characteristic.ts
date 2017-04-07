@@ -7,7 +7,7 @@ export class Characteristic{
   areas: Area[];
   visable: boolean;
   // voltage where is placed protection (relay protection, automatic circuit breaker)
-  ratioStep: number;
+  voltageStep: number;
   // characteristic spread, spread is measured in %
   isSpread: boolean;
   spreadPlus: number;

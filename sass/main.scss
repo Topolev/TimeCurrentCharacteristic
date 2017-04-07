@@ -148,6 +148,18 @@ body{
   font-family: "Open Sans";
 }
 
+.btn-inverse{
+  color: #39c2d7;
+  background: #fff;
+  border:2px solid #39c2d7;
+  margin-bottom: 10px;
+}
+
+.btn-inverse:hover{
+  background: #39c2d7;
+  color: #fff;
+}
+
 //footer
 
 

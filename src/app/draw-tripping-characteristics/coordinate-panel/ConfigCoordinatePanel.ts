@@ -15,6 +15,7 @@ export class ConfigCoordinatePanel {
   colorMainAxis: string;
   colorIntermediateAxis: string;
   font: string;
+  choosenVoltage: number;
 }
 export var defaultConfig: ConfigCoordinatePanel = {
   scale: 1,
@@ -32,5 +33,6 @@ export var defaultConfig: ConfigCoordinatePanel = {
   marginVertical: 40,
   colorMainAxis: "red",
   colorIntermediateAxis: "rgba(0,0,0,0.1)",
-  font: "14px Arial"
+  font: "14px Arial",
+  choosenVoltage: undefined
 }

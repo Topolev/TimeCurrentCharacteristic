@@ -19,6 +19,15 @@
       </div>
     </div>
 
+    <div class="form-group row">
+      <label class="col-2 col-form-label">Ступень напряжения</label>
+      <div class="col-10">
+        <select class="form-control" [(ngModel)]="characteristic.voltageStep">
+          <option *ngFor = 'let voltageStep of voltageSteps' [ngValue] = "voltageStep.value">{{voltageStep.value}}</option>
+        </select>
+      </div>
+    </div>
+
     <create-new-area-modal (onNewArea)="createNewArea($event)" (onEditArea)="editExistArea($event)"
                            #editArea></create-new-area-modal>
     <div class="alert alert-info" role="alert" *ngIf="characteristic.areas.length == 0">

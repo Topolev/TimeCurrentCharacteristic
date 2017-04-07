@@ -7,6 +7,7 @@ import {ConfigCoordinatePanel, defaultConfig} from "../coordinate-panel/ConfigCo
 import {CharacteristicService} from "./characteristic.service";
 import {subscribeOn} from "rxjs/operator/subscribeOn";
 import {Characteristic} from "../coordinate-panel/Characteristic";
+import {defaultVoltageSteps} from "../coordinate-panel/VoltageSteps";
 declare var jQuery: any;
 
 @Component({
@@ -28,6 +29,8 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
   grid: CoordinatePlane = null;
   config: ConfigCoordinatePanel;
   isEditMode: boolean;
+  voltageSteps: Array<{value: number}> = defaultVoltageSteps;
+
 
   constructor(private modalService: NgbModal,
               private activeModal: NgbActiveModal,
@@ -36,8 +39,7 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
       characteristic => {
         this.characteristic = characteristic ? characteristic : new Characteristic();
         this.idCharacteristic = characteristic ? characteristic.id : Date.now();
-        console.log(this.grid);
-        //this.grid.updateAllCharacteristic([this.characteristic]);
+        this.characteristic.voltageStep = characteristic ? characteristic.voltageStep : this.voltageSteps[0].value;
       }
     )
   }

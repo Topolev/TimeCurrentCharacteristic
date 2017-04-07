@@ -9,6 +9,8 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {CharacteristicComponent} from "./modal/characteristic.component";
 import {CharacteristicService} from "./modal/characteristic.service";
 import {Characteristic} from "./coordinate-panel/Characteristic";
+import {CurrentSlice} from "./coordinate-panel/CurrentSlice";
+import {defaultVoltageSteps} from "./coordinate-panel/VoltageSteps";
 
 declare var katex: any;
 
@@ -21,10 +23,13 @@ declare var katex: any;
 export class CoordinatePlaneComponent implements AfterViewInit {
   grid: CoordinatePlane = null;
   characteristics: Characteristic[] = [];
+  currentSlices: Array<CurrentSlice> = [];
+
+  voltageSteps: Array<{value: number}> = defaultVoltageSteps;
+  selectedVoltageStep: number;
 
   @ViewChild('canvas') canvas: ElementRef;
   @ViewChild('canvasBack') canvasBack: ElementRef;
-
 
   config: ConfigCoordinatePanel;
 
@@ -73,9 +78,25 @@ export class CoordinatePlaneComponent implements AfterViewInit {
     this.grid.addCharacteristics(this.characteristics);
   }
 
+  changeCurrentSlices(){
+    this.grid.addCurrentSlices(this.currentSlices);
+  }
+
 
   deleteCharacteristic(characteristic : Characteristic){
     this.characteristics.splice(this.characteristics.indexOf(characteristic),1);
   }
+
+  addCurrentSlice(){
+    this.currentSlices.push(new CurrentSlice());
+    this.changeCurrentSlices();
+  }
+
+  deleteCurrentSlice(currentSlice: CurrentSlice){
+    this.currentSlices.splice(this.currentSlices.indexOf(currentSlice), 1);
+    this.changeCurrentSlices();
+  }
+
+
 
 }

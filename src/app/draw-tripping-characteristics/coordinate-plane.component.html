@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container font-arial">
   <div class="row">
     <div class="col-md-6">
       <div id="wrap-coordinate-panel">
@@ -18,6 +18,16 @@
           <div class="col-2">
             <input class="form-control" type="text" [(ngModel)]="config.scale" id="scale" (input)="rerender()">
           </div>
+          <label for="scale" class="col-4 col-form-label">Ступень трансф-ии</label>
+          <div class="col-4">
+            <div class="input-group">
+              <select class="form-control" [(ngModel)]="config.choosenVoltage" (change)="rerender()">
+                <option [ngValue] = "undefined">не задано</option>
+                <option *ngFor = 'let voltageStep of voltageSteps' [ngValue] = "voltageStep.value">{{voltageStep.value}}</option>
+              </select>
+              <span class="input-group-addon">кВ</span>
+            </div>
+          </div>
         </div>
 
         <hr/>
@@ -27,14 +37,14 @@
             <label class="col-3 col-form-label">Ось тока (I)</label>
             <div class="col-3">
               <div class="input-group">
-                <input class="form-control" type="text"  [(ngModel)]="config.xStepGrid" (input)="rerender()">
+                <input class="form-control" type="text" [(ngModel)]="config.xStepGrid" (input)="rerender()">
                 <span class="input-group-addon">А</span>
               </div>
             </div>
             <label class="col-4 col-form-label">Ось времени (t)</label>
             <div class="col-2">
               <div class="input-group">
-                <input class="form-control" type="text"  [(ngModel)]="config.yStepGrid" (input)="rerender()">
+                <input class="form-control" type="text" [(ngModel)]="config.yStepGrid" (input)="rerender()">
                 <span class="input-group-addon">c</span>
               </div>
             </div>
@@ -47,38 +57,89 @@
     </div>
 
     <div class="col-md-6">
-      <button class="btn btn-primary" (click)="openModal(null)">Создать характеристику</button>
 
-      <div *ngIf="characteristics.length > 0">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>Наименование</th>
-            <th>Цвет</th>
-            <th>Показать</th>
-            <th></th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr *ngFor="let characteristic of characteristics">
-            <td>{{characteristic.label == undefined || characteristic.label.trim() ==''? 'без имени': characteristic.label }}</td>
-            <td>
-              <div style="width:15px;height:15px; border:1px solid #efefef;"
-                   [style.background]="characteristic.color"></div>
-            </td>
-            <td><input type="checkbox" [(ngModel)]="characteristic.visable" (click)="changeVisable(characteristic)"/>
-            </td>
-            <td>
-              <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-secondary btn-sm" (click)="openModal(characteristic)">
-                  &#9998;</button>
-                <button type="button" class="btn btn-secondary btn-sm" (click)="deleteCharacteristic(characteristic)">
+
+      <div class="block-parameters">
+        <h1>Защитные характеристики</h1>
+        <div class="wrap">
+          <button class="btn btn-inverse" (click)="openModal(null)">Создать характеристику</button>
+          <div *ngIf="characteristics.length == 0">
+            <div class="alert alert-warning" role="alert">
+              Вы пока не создали ни одной защитной характеристики.
+            </div>
+          </div>
+
+          <div *ngIf="characteristics.length > 0">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Наименование</th>
+                <th>U, кВ</th>
+                <th>Цвет</th>
+                <th></th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let characteristic of characteristics">
+                <td>{{characteristic.label == undefined || characteristic.label.trim() ==''? 'без имени':
+                  characteristic.label }}
+                </td>
+                <td>
+                  {{characteristic.voltageStep}}
+                </td>
+                <td>
+                  <div style="width:15px;height:15px; border:1px solid #efefef;"
+                       [style.background]="characteristic.color"></div>
+                </td>
+                <td><input type="checkbox" [(ngModel)]="characteristic.visable"
+                           (click)="changeVisable(characteristic)"/>
+                </td>
+                <td>
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-secondary btn-sm" (click)="openModal(characteristic)">
+                      &#9998;</button>
+                    <button type="button" class="btn btn-secondary btn-sm"
+                            (click)="deleteCharacteristic(characteristic)">
+                      &#10005;</button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="block-parameters">
+        <h1>Срезы по току</h1>
+        <div class="wrap">
+          <button (click)="addCurrentSlice()" class="btn btn-inverse">Создать срез по току</button>
+          <div class="alert alert-warning" role="alert" *ngIf="currentSlices.length == 0">
+            Вы пока не создали ни одного среза по току.
+          </div>
+          <table class="table table-bordered" *ngIf="currentSlices.length>0">
+            <thead>
+            <tr>
+              <th>Наименование</th>
+              <th>Ток, А</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let currentSlice of currentSlices">
+              <td><input type="text" class="form-control" [(ngModel)]='currentSlice.label'></td>
+              <td><input type="text" class="form-control" [(ngModel)]='currentSlice.current'
+                         (keyup)="changeCurrentSlices()"></td>
+              <td>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="deleteCurrentSlice(currentSlice)">
                   &#10005;</button>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
