@@ -54,6 +54,7 @@ export default class CoordinatePlane {
     this.height = canvasMain.offsetHeight;
 
     this.config = config;
+    this.validateConfigData();
 
     this.ctxMain.font = "14px Arial";
 
@@ -63,6 +64,12 @@ export default class CoordinatePlane {
     //this.canvasMain.addEventListener("mouseup", this.mouseUp);
 
     this.drawWorkspace();
+  }
+
+  private validateConfigData() {
+   /* this.config.scale = this.config.scale || +this.config.scale <= 0 ? 1 : this.config.scale;
+    this.config.xStepGrid = this.config.xStepGrid || +this.config.xStepGrid <=0 ? 20 :this.config.xStepGrid;
+    this.config.yStepGrid = this.config.yStepGrid || +this.config.yStepGrid <=0 ? 0.1 :this.config.yStepGrid;*/
   }
 
 
@@ -79,6 +86,14 @@ export default class CoordinatePlane {
 
   public addCharacteristics(characteristics: Characteristic[]) {
     this.characteristics = characteristics;
+    this.render();
+  }
+
+  public updateConfigPanel() {
+    let config = this.config;
+    config.scale = +config.scale <= 0 ? defaultConfig.scale : config.scale;
+    config.xStepGrid = +config.xStepGrid <=0 ? defaultConfig.xStepGrid : config.xStepGrid;
+    config.yStepGrid = +config.yStepGrid <=0 ? defaultConfig.yStepGrid : config.yStepGrid;
     this.render();
   }
 
@@ -227,7 +242,7 @@ export default class CoordinatePlane {
   private drawHorizontalLineForArea(x: number, characterictic: Characteristic, area: Area) {
     switch (area.type) {
       case 0: {
-        this.drawHorizonalLineForPoints(+x,characterictic, area);
+        this.drawHorizonalLineForPoints(+x, characterictic, area);
         break;
       }
       case 1: {
@@ -242,35 +257,35 @@ export default class CoordinatePlane {
   }
 
 
-  private drawHorizontalLineForIndependent(xFact: number,characteristic: Characteristic, area: Area) {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+  private drawHorizontalLineForIndependent(xFact: number, characteristic: Characteristic, area: Area) {
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
     var xOrigin = this.xFactToOrigin(xFact);
     let yOrigin = +area.fn(xOrigin);
-    if (xOrigin/iBase > +area.variables['Isz']) {
+    if (xOrigin / iBase > +area.variables['Isz']) {
       this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
     }
   }
 
   private drawHorizonalLineForPoints(xFact: number, characteristic: Characteristic, area: Area) {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
     var xOrigin = this.xFactToOrigin(xFact);
-    if ((+area.points[0].x < xOrigin/iBase) && (+area.points[area.points.length - 1].x > xOrigin/iBase)) {
+    if ((+area.points[0].x < xOrigin / iBase) && (+area.points[area.points.length - 1].x > xOrigin / iBase)) {
       var prevPoint = area.points[0];
       var i = 0;
-      while (prevPoint.x < xOrigin/iBase && i < area.points.length) {
+      while (prevPoint.x < xOrigin / iBase && i < area.points.length) {
         prevPoint = area.points[++i];
       }
 
       var fn = this.approximationByLine(area.points[i - 1], prevPoint);
-      let yOrigin = fn(xOrigin/iBase);
+      let yOrigin = fn(xOrigin / iBase);
       this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
     }
   }
 
   private drawHorizonalLineForExpression(xFact: number, characteristic: Characteristic, area: Area) {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
     var xOrigin = this.xFactToOrigin(xFact);
-    let yOrigin = area.fn(xOrigin/iBase);
+    let yOrigin = area.fn(xOrigin / iBase);
     this.drawHorizontalLineFromXOriginToEndWorkspace(xOrigin, yOrigin);
   }
 
@@ -283,7 +298,6 @@ export default class CoordinatePlane {
       this.renderTextAndFillBackground(this.ctxMain, (yOrigin.toFixed(2)).toString(), this.width - this.config.marginHorizontal + 5, yFact);
     }
   }
-
 
 
   private drawLineDash(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string = "red") {
@@ -316,6 +330,7 @@ export default class CoordinatePlane {
 
   public render(config: ConfigCoordinatePanel = this.config) {
     this.config = config;
+    this.validateConfigData();
     this.clearWorkspace(this.ctxMain);
     this.drawAxises();
 
@@ -352,14 +367,14 @@ export default class CoordinatePlane {
   private calcXStartForArea(characteristic: Characteristic, area: Area): number {
     var uBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
 
-    return (!!!area.xStart && String(area.xStart).trim() != '' && area.xStart*uBase > -this.config.x0Offset) ? +area.xStart : -this.config.x0Offset;
+    return (!!!area.xStart && String(area.xStart).trim() != '' && area.xStart * uBase > -this.config.x0Offset) ? +area.xStart : -this.config.x0Offset;
   }
 
   private drawIndependentCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
 
     var tsz = +area.variables['tsz'];
-    var Isz = +area.variables['Isz']*iBase;
+    var Isz = +area.variables['Isz'] * iBase;
 
     var yTopWorkspace = (this.height - 2 * this.config.marginVertical) / this.config.scale - this.config.y0Offset;
     var yTop = prevPointArea ? prevPointArea.y : yTopWorkspace;
@@ -380,17 +395,17 @@ export default class CoordinatePlane {
   }
 
   private drawExpressionCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000', step: number = 1): Point {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
 
     var xPrev: number = this.calcXStartForArea(characteristic, area);
     var yPrev: number = +area.fn(xPrev);
 
     var xEndWorkspace = (this.width - 2 * this.config.marginHorizontal) / this.config.scale - this.config.x0Offset;
     var xEnd: number = (area.xEnd != null && area.xEnd < xEndWorkspace) ? area.xEnd : xEndWorkspace;
-    for (let i = xPrev + step; i*iBase < xEnd; i += step) {
+    for (let i = xPrev + step; i * iBase < xEnd; i += step) {
       utilCanvas.drawLine(this.ctxMain,
-        +this.xOriginToFact(xPrev*iBase), this.yOriginToFact(yPrev),
-        this.xOriginToFact((xPrev + step)*iBase), this.yOriginToFact(+area.fn(xPrev + step)), color);
+        +this.xOriginToFact(xPrev * iBase), this.yOriginToFact(yPrev),
+        this.xOriginToFact((xPrev + step) * iBase), this.yOriginToFact(+area.fn(xPrev + step)), color);
 
       xPrev = xPrev + step;
       yPrev = +area.fn(xPrev);
@@ -399,13 +414,13 @@ export default class CoordinatePlane {
   }
 
   private drawPointsCharacteristic(characteristic: Characteristic, area: Area, prevPointArea: Point = null, color: string = '#000000'): Point {
-    var iBase = this.config.choosenVoltage ? characteristic.voltageStep/this.config.choosenVoltage : 1;
+    var iBase = this.config.choosenVoltage ? characteristic.voltageStep / this.config.choosenVoltage : 1;
 
     var pointPrev = area.points[0];
     for (var i = 1; i < area.points.length; i++) {
       utilCanvas.drawLine(this.ctxMain,
         this.xOriginToFact(+pointPrev.x * iBase), this.yOriginToFact(+pointPrev.y),
-        this.xOriginToFact(+area.points[i].x *iBase), this.yOriginToFact(+area.points[i].y), characteristic.color);
+        this.xOriginToFact(+area.points[i].x * iBase), this.yOriginToFact(+area.points[i].y), characteristic.color);
       pointPrev = area.points[i];
     }
     return pointPrev;

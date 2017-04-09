@@ -55,7 +55,7 @@ export class CoordinatePlaneComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.grid = new CoordinatePlane(this.canvas.nativeElement, this.canvasBack.nativeElement, this.config)
+    this.grid = new CoordinatePlane(this.canvas.nativeElement, this.canvasBack.nativeElement, this.config);
     //katex.render("t = \\frac{0.14k}{(I/I_{sz})^{0,02}-1}", this.test.nativeElement)
   }
 
@@ -66,6 +66,10 @@ export class CoordinatePlaneComponent implements AfterViewInit {
 
   rerender() {
     this.grid.render(this.config);
+  }
+
+  changeConfig(){
+    this.grid.updateConfigPanel();
   }
 
   openModal(characterisctic: Characteristic) {

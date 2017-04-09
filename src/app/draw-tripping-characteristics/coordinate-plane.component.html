@@ -16,12 +16,12 @@
         <div class="form-group row">
           <label for="scale" class="col-2 col-form-label">Масштаб</label>
           <div class="col-2">
-            <input class="form-control" type="text" [(ngModel)]="config.scale" id="scale" (input)="rerender()">
+            <input class="form-control" type="text" [(ngModel)]="config.scale" id="scale" (input)="changeConfig()">
           </div>
           <label for="scale" class="col-4 col-form-label">Ступень трансф-ии</label>
           <div class="col-4">
             <div class="input-group">
-              <select class="form-control" [(ngModel)]="config.choosenVoltage" (change)="rerender()">
+              <select class="form-control" [(ngModel)]="config.choosenVoltage" (change)="changeConfig()">
                 <option [ngValue] = "undefined">не задано</option>
                 <option *ngFor = 'let voltageStep of voltageSteps' [ngValue] = "voltageStep.value">{{voltageStep.value}}</option>
               </select>
@@ -37,14 +37,14 @@
             <label class="col-3 col-form-label">Ось тока (I)</label>
             <div class="col-3">
               <div class="input-group">
-                <input class="form-control" type="text" [(ngModel)]="config.xStepGrid" (input)="rerender()">
+                <input class="form-control" type="text" [(ngModel)]="config.xStepGrid" (input)="changeConfig()">
                 <span class="input-group-addon">А</span>
               </div>
             </div>
             <label class="col-4 col-form-label">Ось времени (t)</label>
             <div class="col-2">
               <div class="input-group">
-                <input class="form-control" type="text" [(ngModel)]="config.yStepGrid" (input)="rerender()">
+                <input class="form-control" type="text" [(ngModel)]="config.yStepGrid" (input)="changeConfig()">
                 <span class="input-group-addon">c</span>
               </div>
             </div>
