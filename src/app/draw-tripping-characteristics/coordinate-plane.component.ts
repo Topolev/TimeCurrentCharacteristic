@@ -12,7 +12,7 @@ import {Characteristic} from "./coordinate-panel/Characteristic";
 import {CurrentSlice} from "./coordinate-panel/CurrentSlice";
 import {defaultVoltageSteps} from "./coordinate-panel/VoltageSteps";
 
-declare var katex: any;
+
 
 @Component({
   selector: 'coordinate-plane',

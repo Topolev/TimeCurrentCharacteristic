@@ -6,6 +6,7 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {CharacteristicComponent} from "./modal/characteristic.component";
 import {CreateNewArea} from "./modal/area.component";
 import {CharacteristicService} from "./modal/characteristic.service";
+import {RenderTexStandardComponent} from "./modal/render-tex-standard.conponent";
 
 
 @NgModule({
@@ -17,6 +18,7 @@ import {CharacteristicService} from "./modal/characteristic.service";
   declarations: [
     CoordinatePlaneComponent,
     CharacteristicComponent,
+    RenderTexStandardComponent,
     CreateNewArea
   ],
   entryComponents: [

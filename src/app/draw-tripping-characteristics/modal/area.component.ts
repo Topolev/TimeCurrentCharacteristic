@@ -7,6 +7,7 @@ import {BuilderArea} from "../coordinate-panel/area-builder";
 import Point from "../coordinate-panel/Point";
 import {PointsTemplate, defaultPointsTemplate} from "../coordinate-panel/PointsTemplate";
 declare var jQuery: any;
+declare var katex: any;
 
 @Component({
   selector: 'create-new-area-modal',
@@ -102,6 +103,10 @@ export class CreateNewArea {
     this.label = "";
     this.currentArea = null;
     jQuery('body').addClass('modal-open');
+  }
+
+  renderFormulaForExpression(){
+
   }
 
 
