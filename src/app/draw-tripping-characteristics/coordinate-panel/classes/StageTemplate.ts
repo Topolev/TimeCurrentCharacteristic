@@ -1,44 +1,12 @@
-import Point from "./Point";
-import {PointsTemplate} from "./PointsTemplate";
-import {ConfigCoordinatePanel} from "./ConfigCoordinatePanel";
-export const enum TYPE_AREA  {
+import {PointsTemplate} from "../PointsTemplate";
+import {ConfigCoordinatePanel} from "../ConfigCoordinatePanel";
+export const enum TYPE_STAGE  {
   POINTS_ABS,
   POINTS_RELATIVE,
   EXPRESSION,
   INDEPENDENT
 }
 
-export interface StringArray {
-  [index: number]: string;
-}
-
-
-
-
-
-
-
-export class Area {
-  id:number;
-  areaTemplate: AreaTemplate;
-  pointsTemplate: PointsTemplate;
-
-  xStart: number = 0;
-  xEnd: number = 0;
-  type: TYPE_AREA;
-  label: string;
-
-  //Make sense only for Expression and Independent
-  variables?: Array<StringArray>;
-  fn?: (x:number)=> number;
-
-  //Make sense only for Points
-  points?: Point[];
-
-  //Make sense only for Points with relative values
-  baseValue: number;
-
-}
 
 
 export class VariableDescription {
@@ -46,10 +14,11 @@ export class VariableDescription {
   label: string;
 }
 
-export class AreaTemplate {
+
+export class StageTemplate {
   id: number;
   label: string;
-  type: TYPE_AREA;
+  type: TYPE_STAGE;
 
   //Make sense only for ExpressionArea
   variableDescriptions?: VariableDescription[];
@@ -57,23 +26,25 @@ export class AreaTemplate {
   displayExpression?: string;
 }
 
-export const defaultAreaTemplates: AreaTemplate[] = [
+
+
+export const defaultStageTemplates: StageTemplate[] = [
   {
     id: 0,
     label: "По точкам (абсолютные значение)",
-    type: TYPE_AREA.POINTS_ABS
+    type: TYPE_STAGE.POINTS_ABS
   },
   {
     id: 1,
     label: "По точкам (относительные значение)",
-    type: TYPE_AREA.POINTS_RELATIVE
+    type: TYPE_STAGE.POINTS_RELATIVE
   },
   {
     id: 2,
     label: "Независимая",
-    type: TYPE_AREA.INDEPENDENT,
+    type: TYPE_STAGE.INDEPENDENT,
     variableDescriptions: [{
-      label: "Is",
+      label: "Isz",
       labelForUser: "Пусковой ток",
     }, {
       label: "tsz",
@@ -87,7 +58,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 3,
     label: "IEC стандартно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени T",
@@ -105,10 +76,10 @@ export const defaultAreaTemplates: AreaTemplate[] = [
       return T * (0.14 / (Math.pow(I / Is, 0.02) - 1)) + C;
     },
     displayExpression: "t = T \\times \\frac{0.14}{\\left( \\frac{I}{I_s}\\right)^{0.02}-1} + C"
-  },{
+  } ,{
     id: 4,
     label: "IEC сильно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени T",
@@ -129,7 +100,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   },{
     id: 5,
     label: "IEC чрезвычайно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -151,7 +122,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 6,
     label: "UK длительно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -172,7 +143,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   },{
     id: 7,
     label: "UK для выпрямителя",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -194,7 +165,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 8,
     label: "IEEE умеренно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -215,7 +186,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   },{
     id: 9,
     label: "IEEE сильно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -236,7 +207,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   },{
     id: 10,
     label: "IEEE чрезвычайно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени T",
@@ -258,7 +229,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 11,
     label: "US инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -279,7 +250,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   },{
     id: 12,
     label: "US кратковременно инверсная",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени",
@@ -301,7 +272,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 13,
     label: "RI",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "K",
       labelForUser: "Коэффициент K",
@@ -319,7 +290,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 14,
     label: "Реле РТВ-I",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени T",
@@ -337,7 +308,7 @@ export const defaultAreaTemplates: AreaTemplate[] = [
   {
     id: 15,
     label: "Реле РТВ-IV",
-    type: TYPE_AREA.EXPRESSION,
+    type: TYPE_STAGE.EXPRESSION,
     variableDescriptions: [{
       label: "T",
       labelForUser: "Постоянная времени T",
@@ -351,7 +322,17 @@ export const defaultAreaTemplates: AreaTemplate[] = [
       return 1 / (20 * Math.pow((I / Is - 1) / 6, 1.8)) + T;
     },
     displayExpression: "t = \\frac{1}{20 \\times \\left( \\left( \\frac{I}{I_s} - 1 \\right)/6\\right)^{1.8}} + T "
-  }];
+  }
+];
+
+
+
+
+
+
+
+
+
 
 
 

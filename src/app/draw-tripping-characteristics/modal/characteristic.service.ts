@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Subject} from "rxjs";
-import {Characteristic} from "../coordinate-panel/Characteristic";
+import {Characteristic} from "../coordinate-panel/characteristic/Characteristic";
 
 
 @Injectable()
@@ -19,7 +19,6 @@ export class CharacteristicService{
   setNewCharacteristic(characteristic: Characteristic){
     this.newCharacteristic.next(characteristic);
   }
-
 
 
 }

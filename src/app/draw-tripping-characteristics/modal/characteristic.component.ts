@@ -1,14 +1,24 @@
-import {Component, ViewChild, ElementRef, AfterViewInit, OnInit, ChangeDetectorRef} from '@angular/core';
-
-import {NgbModal, ModalDismissReasons, NgbModalRef, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {AreaTemplate, Area} from "../coordinate-panel/area-template";
+import {Component, ViewChild, ElementRef, AfterViewInit, OnInit} from "@angular/core";
+import {NgbModal, NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
 import CoordinatePlane from "../coordinate-panel/CoordinatePlane";
-import {ConfigCoordinatePanel, defaultConfig} from "../coordinate-panel/ConfigCoordinatePanel";
+import {ConfigCoordinatePanel} from "../coordinate-panel/ConfigCoordinatePanel";
 import {CharacteristicService} from "./characteristic.service";
-import {subscribeOn} from "rxjs/operator/subscribeOn";
-import {Characteristic} from "../coordinate-panel/Characteristic";
 import {defaultVoltageSteps} from "../coordinate-panel/VoltageSteps";
+import {Characteristic, TYPE_PROTECTION} from "../coordinate-panel/characteristic/Characteristic";
+import {
+  PointsTemplate,
+  defaultFusePointTemplates,
+  defaultSwitcherPointTemplates
+} from "../coordinate-panel/PointsTemplate";
+import Point from "../coordinate-panel/Point";
+import Stage from "../coordinate-panel/classes/Stage";
+import {BuilderStage} from "../coordinate-panel/classes/BuilderStage";
+import {defaultStageTemplates} from "../coordinate-panel/classes/StageTemplate";
+import PointsAbsStage from "../coordinate-panel/classes/PointsAbsStage";
+import PointsRelativeStage from "../coordinate-panel/classes/PointsRelativeStage";
 declare var jQuery: any;
+
+
 
 @Component({
   selector: 'ngbd-modal-basic',
@@ -21,7 +31,6 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
 
   @ViewChild('canvas') canvas: ElementRef;
   @ViewChild('canvasBack') canvasBack: ElementRef;
-
   @ViewChild("contentModal") contentModal: ElementRef;
 
   characteristic: Characteristic = new Characteristic();
@@ -30,6 +39,10 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
   config: ConfigCoordinatePanel;
   isEditMode: boolean;
   voltageSteps: Array<{value: number}> = defaultVoltageSteps;
+
+  typeProtection: TYPE_PROTECTION;
+  // Default characteristics for fuse which is assigned as PointAbsStage
+
 
 
   constructor(private modalService: NgbModal,
@@ -44,12 +57,10 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
     )
   }
 
-
   openModal() {
     this.modalService.open(this.contentModal).result.then(() => {
     });
   }
-
   closeModal() {
     this.activeModal.close();
   }
@@ -60,35 +71,64 @@ export class CharacteristicComponent implements AfterViewInit, OnInit {
     this.activeModal.close();
   }
 
-
   ngAfterViewInit(): void {
     this.grid = new CoordinatePlane(this.canvas.nativeElement, this.canvasBack.nativeElement, this.config);
     this.grid.updateAllCharacteristic([this.characteristic]);
   }
 
-  private deleteArea(area: Area) {
-    this.characteristic.areas.splice(this.characteristic.areas.indexOf(area), 1);
+  private deleteStage(stage: Stage) {
+    this.characteristic.stages.splice(this.characteristic.stages.indexOf(stage), 1);
   }
 
-  private createNewArea(area: Area) {
-    this.characteristic.areas.push(area);
+  private createNewStage(stage: Stage) {
+    console.log("Create new stage", stage);
+    this.characteristic.stages.push(stage);
     this.grid.updateAllCharacteristic([this.characteristic]);
-    //jQuery('body').addClass('modal-open');
   }
 
-
-
-  private editExistArea(editArea: Area) {
-    var areas = this.characteristic.areas;
-    for (let i in areas) {
-      if (areas[i].id === editArea.id) {
-        areas[i] = editArea;
+  private editExistStage(editStage: Stage) {
+    var stages = this.characteristic.stages;
+    for (let i in stages) {
+      if (stages[i].id === editStage.id) {
+        stages[i] = editStage;
         break;
       }
     }
     this.grid.updateAllCharacteristic([this.characteristic]);
-    //jQuery('body').addClass('modal-open');
   }
 
+  changeTypeProtection(){
+    this.characteristic.stages = [];
+    //this.selectedFusePointsTemplate = null;
+    //this.selectedSwitcherPointsTemplate = null;
+  }
+
+
+  //I think this feature we have to take out into the seperate component or create service
+  fusePointsTemplates: PointsTemplate[] = defaultFusePointTemplates;
+  //selectedFusePointsTemplate: PointsTemplate;
+  builderStage = new BuilderStage();
+
+  buildFuseCharacteristic(){
+    if (this.characteristic.pointsTemplate !=null) {
+      let stage: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[0], this.characteristic);
+      (<PointsAbsStage> stage).points = this.characteristic.pointsTemplate.points.map(point => new Point(point.x, point.y));
+      this.characteristic.stages = [stage];
+    } else{
+      this.characteristic.stages = [];
+    }
+  }
+
+  switcherPointsTemplates: PointsTemplate[] = defaultSwitcherPointTemplates;
+  //selectedSwitcherPointsTemplate: PointsTemplate;
+  buildSwitcherCharacteristic(){
+    if (this.characteristic.pointsTemplate !=null) {
+      let stage: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[1], this.characteristic);
+      (<PointsRelativeStage> stage).points = this.characteristic.pointsTemplate.points.map(point => new Point(point.x, point.y));
+      this.characteristic.stages = [stage];
+    } else{
+      this.characteristic.stages = [];
+    }
+  }
 
 }

@@ -1,43 +1,103 @@
+<div class="modal-header">
+  <h4 class="modal-title">Создать характеристику</h4>
+  <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
 
-  <div class="modal-header">
-    <h4 class="modal-title">Создать характеристику</h4>
-    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
-      <span aria-hidden="true">&times;</span>
-    </button>
+
+  <div class="form-group row">
+    <label class="col-2 col-form-label">Имя</label>
+    <div class="col-8">
+      <input class="form-control" type="text" [(ngModel)]='characteristic.label'>
+    </div>
+    <div class="col-2">
+      <p style="width:100%; height:36px; border:1px solid #efefef; border-radius: 4px;">
+        <input type="color" style="width:100%; height:100%; background: none;" [(ngModel)]='characteristic.color'/>
+      </p>
+    </div>
   </div>
-  <div class="modal-body">
 
-
-
-    <div class="form-group row">
-      <label class="col-2 col-form-label">Имя</label>
-      <div class="col-8">
-        <input class="form-control" type="text" [(ngModel)] = 'characteristic.label'>
-      </div>
-      <div class="col-2">
-        <p style="width:100%; height:36px; border:1px solid #efefef; border-radius: 4px;">
-          <input type="color" style="width:100%; height:100%; background: none;" [(ngModel)] = 'characteristic.color'/>
-        </p>
-      </div>
+  <div class="form-group row">
+    <label class="col-4 col-form-label" style="text-align:right;">Ступень напряжения</label>
+    <div class="col-8">
+      <select class="form-control" [(ngModel)]="characteristic.voltageStep">
+        <option *ngFor='let voltageStep of voltageSteps' [ngValue]="voltageStep.value">{{voltageStep.value}}</option>
+      </select>
     </div>
+  </div>
 
-    <div class="form-group row">
-      <label class="col-2 col-form-label">Ступень напряжения</label>
-      <div class="col-10">
-        <select class="form-control" [(ngModel)]="characteristic.voltageStep">
-          <option *ngFor = 'let voltageStep of voltageSteps' [ngValue] = "voltageStep.value">{{voltageStep.value}}</option>
-        </select>
+  <div class="form-group row">
+    <label class="col-4 col-form-label" style="text-align:right;">Тип защиты</label>
+    <div class="col-8">
+      <select class="form-control" [(ngModel)]="characteristic.typeProtection" (change)="changeTypeProtection()">
+        <option [ngValue]="null">Не выбрано</option>
+        <option [ngValue]="0">Предохранитель</option>
+        <option [ngValue]="1">Автоматический выключатель</option>
+        <option [ngValue]="2">Пользовательская настройка</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div [ngSwitch]="characteristic.typeProtection">
+
+    <!--SET UP FUSE-->
+    <div *ngSwitchCase="0">
+
+      <div class="form-group row">
+        <label class="col-4 col-form-label" style="text-align:right;">Тип предохранителя</label>
+        <div class="col-8">
+          <select class="form-control" [(ngModel)]="characteristic.pointsTemplate" (change)="buildFuseCharacteristic()">
+            <option [ngValue]="null">Задать</option>
+            <option *ngFor="let fusePointsTemplate of fusePointsTemplates" [ngValue]="fusePointsTemplate">
+              {{fusePointsTemplate.label}}
+            </option>
+          </select>
+        </div>
       </div>
-    </div>
 
-    <create-new-area-modal (onNewArea)="createNewArea($event)" (onEditArea)="editExistArea($event)"
-                           #editArea></create-new-area-modal>
-    <div class="alert alert-info" role="alert" *ngIf="characteristic.areas.length == 0">
-      <strong>Внимание!</strong> Должен быть задан как минимум один участок время-токовой характеристики.
     </div>
+    <!--END SET UP FUSE-->
 
-    <div *ngIf="characteristic.areas.length >0">
-      <table class="table table-bordered" >
+    <!--SET UP SWITCHER-->
+    <div *ngSwitchCase="1">
+
+      <div class="form-group row">
+        <label class="col-4 col-form-label" style="text-align:right;">Тип автоматического выключателя</label>
+        <div class="col-8">
+          <select class="form-control" [(ngModel)]="characteristic.pointsTemplate"
+                  (change)="buildSwitcherCharacteristic()">
+            <option [ngValue]="null">Задать</option>
+            <option *ngFor="let switcherPointsTemplate of switcherPointsTemplates" [ngValue]="switcherPointsTemplate">
+              {{switcherPointsTemplate.label}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row" *ngIf="characteristic.pointsTemplate != null">
+        <label class="col-4 col-form-label" style="text-align:right;">Пусковой ток</label>
+        <div class="col-8">
+          <input class="form-control" type="text" [(ngModel)]='characteristic.stages[0].baseValue'>
+        </div>
+      </div>
+
+    </div>
+    <!--END SET UP SWITCHER-->
+
+    <!--SET UP CUSTOME PROTECTION-->
+    <div *ngSwitchCase="2">
+
+      <create-new-area-modal [characteristic]="characteristic" (onNewStage)="createNewStage($event)"
+                             (onEditStage)="editExistStage($event)"
+                             #editArea></create-new-area-modal>
+      <div class="alert alert-info" role="alert" *ngIf="characteristic.stages.length == 0">
+        <strong>Внимание!</strong> Должен быть задан как минимум один участок время-токовой характеристики.
+      </div>
+
+      <table class="table table-bordered" *ngIf="characteristic.stages.length > 0">
         <thead>
         <tr>
           <th rowspan="2">Наименование</th>
@@ -51,62 +111,72 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let area of characteristic.areas">
-          <td>{{area.label == undefined || area.label.trim() == ''? 'без имени': area.label}}</td>
-          <td>{{area.areaTemplate.label}}</td>
+        <tr *ngFor="let stage of characteristic.stages">
+          <td>{{stage.label == undefined || stage.label.trim() == ''? 'без имени': stage.label}}</td>
+          <td>{{stage.stageTemplate.label}}</td>
           <td>
-            <span *ngIf="area.xStart == undefined || area.xStart.trim() == ''">-&#x221E;</span>
-            {{area.xStart}}
+            <span *ngIf="stage.xStart == undefined || stage.xStart.trim() == ''">-&#x221E;</span>
+            {{stage.xStart}}
           </td>
           <td>
-            <span *ngIf="area.xEnd == undefined">+&#x221E;</span>
-            {{area.xEnd}}
+            <span *ngIf="stage.xEnd == undefined">+&#x221E;</span>
+            {{stage.xEnd}}
           </td>
           <td>
             <div class="btn-group" role="group" aria-label="Basic example">
-              <button type="button" class="btn btn-secondary btn-sm " (click)="editArea.open(area)">&#9998;</button>
-              <button type="button" class="btn btn-secondary btn-sm" (click)="deleteArea(area)">&#10005;</button>
+              <button type="button" class="btn btn-secondary btn-sm " (click)="editArea.open(stage)">&#9998;</button>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="deleteArea(stage)">&#10005;</button>
             </div>
           </td>
         </tr>
         </tbody>
       </table>
 
-      <div>
-        <p>Учет разброса характеристик  <input type="checkbox" [(ngModel)]="characteristic.isSpread"></p>
-        <div class="form-group row" *ngIf="characteristic.isSpread">
-          <label class="col-3 col-form-label">Разброс вверх</label>
-          <div class="col-3">
-            <div class="input-group">
-              <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadPlus">
-              <span class="input-group-addon">%</span>
-            </div>
-          </div>
-          <label class="col-3 col-form-label">Разброс вниз</label>
-          <div class="col-3">
-            <div class="input-group">
-              <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadMinus">
-              <span class="input-group-addon">%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-
     </div>
-
-    <div id="wrap-coordinate-panel-stratch">
-      <canvas width="668" height="400" id="canvasBack"#canvasBack></canvas>
-      <canvas width="668" height="400" id="canvas" #canvas></canvas>
-    </div>
-
+    <!--END SET UP CUSTOME PROTECTION-->
 
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="saveCharacteristic()">Save</button>
-    <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+
+  <div id="wrap-coordinate-panel-stratch">
+    <canvas width="668" height="400" id="canvasBack" #canvasBack></canvas>
+    <canvas width="668" height="400" id="canvas" #canvas></canvas>
   </div>
+
+</div>
+
+
+<!--
+
+
+   <div>
+     <p>Учет разброса характеристик  <input type="checkbox" [(ngModel)]="characteristic.isSpread"></p>
+     <div class="form-group row" *ngIf="characteristic.isSpread">
+       <label class="col-3 col-form-label">Разброс вверх</label>
+       <div class="col-3">
+         <div class="input-group">
+           <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadPlus">
+           <span class="input-group-addon">%</span>
+         </div>
+       </div>
+       <label class="col-3 col-form-label">Разброс вниз</label>
+       <div class="col-3">
+         <div class="input-group">
+           <input class="form-control" type="text"  [(ngModel)]="characteristic.spreadMinus">
+           <span class="input-group-addon">%</span>
+         </div>
+       </div>
+     </div>
+   </div>
+
+
+
+
+ </div>-->
+
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="saveCharacteristic()">Save</button>
+  <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+</div>
 
 

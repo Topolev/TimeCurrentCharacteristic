@@ -1,110 +1,142 @@
 <template #content let-c="close" let-d="dismiss">
+
   <div class="modal-header">
     <h4 class="modal-title">Создать участок</h4>
     <button type="button" class="close" aria-label="Close" (click)="d()">
       <span aria-hidden="true">&times;</span>
     </button>
-  </div>
+  </div><!--END .modal-header-->
+
   <div class="modal-body">
+
     <div class="form-group">
       <label>Наименование участка</label>
       <input class="form-control" [(ngModel)]="label">
     </div>
+
     <div class="form-group">
       <label>Тип характеристики</label>
-      <select class="form-control" [(ngModel)]="selectedAreaTemplate" (change)="buildArea()">
+      <select class="form-control" [(ngModel)]="selectedStageTemplate" (change)="buildStage()">
         <option [ngValue]="null"></option>
-        <option *ngFor="let areaTemplate of areaTemplates" [ngValue]="areaTemplate">{{areaTemplate.label}}</option>
+        <option *ngFor="let stageTemplate of stageTemplates" [ngValue]="stageTemplate">{{stageTemplate.label}}</option>
       </select>
     </div>
 
-    <div *ngIf="selectedAreaTemplate">
+    <div *ngIf="selectedStageTemplate">
 
 
-      <!-- 0 equal to POINTS-->
-      <div *ngIf="currentArea.type == 0">
+      <!--SETUP POINTS ABS/RELATIVE -->
+      <div *ngIf="selectedStageTemplate.type == 0 || selectedStageTemplate.type == 1">
+        <button (click)="addPoint()" class="btn btn-primary" style="margin:10px 0;">Добавить точку</button>
 
-        <div class="form-group">
-          <label>Тип характеристики</label>
-          <select class="form-control" [(ngModel)]="selectedPointsTemplate" (change)="buildPointsTemplate()">
-            <option [ngValue]="null">Задать</option>
-            <option *ngFor="let pointTemplate of pointsTemplates" [ngValue]="pointTemplate">{{pointTemplate.label}}
-            </option>
-          </select>
-        </div>
-
-        <div *ngIf="selectedPointsTemplate == null">
-          <button (click)="addPoint()" class="btn btn-primary">Добавить точку</button>
-          <table class="table table-bordered" >
-            <thead>
-            <tr>
-              <th>I, А</th>
-              <th>t, c</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let point of currentArea.points">
-              <td><input type="text" class="form-control" [(ngModel)]="point.x"/></td>
-              <td><input type="text" class="form-control" [(ngModel)]="point.y"/></td>
-              <td>
-                <button type="button" class="btn btn-secondary btn-sm" (click)="deletePoint(point)">&#10005;</button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!-- 1 equal to EXPRESSION or INDEPENDENT-->
-      <div *ngIf="currentArea.type == 1 ||currentArea.type == 2 ">
-
-        <div class="form-group">
-          <label>Диапазон участка </label>
-          <div class="form-group row">
-            <label class="col-2 col-form-label">начало</label>
-            <div class="col-4">
-              <div class="input-group">
-                <input type="text" class="form-control" [(ngModel)]="currentArea.xStart">
-                <span class="input-group-addon" id="basic-addon2">А</span>
-              </div>
-            </div>
-            <label class="col-2 col-form-label">конец</label>
-            <div class="col-4">
-              <div class="input-group">
-                <input type="text" class="form-control" [(ngModel)]="currentArea.xEnd">
-                <span class="input-group-addon">А</span>
-              </div>
-            </div>
+        <div class="form-group row" *ngIf="selectedStageTemplate.type == 1">
+          <label class="col-md-4">Пусковой ток</label>
+          <div class="col-md-8">
+            <input class="form-control" [(ngModel)]="currentStage.baseValue">
           </div>
         </div>
 
-        <div *ngIf="currentArea.type == 1">
-          <render-tex-standard [expression]="currentArea.areaTemplate.displayExpression"></render-tex-standard>
+
+        <div class="alert alert-info" *ngIf="currentStage.points.length == 0">
+          Для построения указанной характеристики вы должны задать по крайней мере 2 точки
         </div>
+        <table class="table table-bordered" *ngIf="currentStage.points.length > 0">
+          <thead>
+          <tr>
+            <th>I, А</th>
+            <th>t, c</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let point of currentStage.points">
+            <td><input type="text" class="form-control" [(ngModel)]="point.x"/></td>
+            <td><input type="text" class="form-control" [(ngModel)]="point.y"/></td>
+            <td>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="deletePoint(point)">&#10005;</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--END SETUP POINTS ABS/RELATIVE-->
+
+      <!--SETUP EXPRESSION -->
+      <div *ngIf="selectedStageTemplate.type == 2">
+        EXPRESSION
+        <render-tex-standard [expression]="currentStage.stageTemplate.displayExpression"></render-tex-standard>
 
         <div class="form-group">
           <label>Параметры характеристики</label>
           <div class="form-group row"
-               *ngFor="let variableDesc of currentArea.areaTemplate.variableDescriptions">
+               *ngFor="let variableDesc of currentStage.stageTemplate.variableDescriptions">
             <label class="col-8 col-form-label" style="text-align:right;">{{variableDesc.labelForUser}}</label>
             <div class="col-4">
-              <input class="form-control" type="text" [(ngModel)]="currentArea.variables[variableDesc.label]">
+              <input class="form-control" type="text" [(ngModel)]="currentStage.variables[variableDesc.label]">
             </div>
           </div>
         </div>
 
       </div>
+      <!--END SETUP EXPRESSION -->
 
     </div>
 
 
-  </div>
+  </div><!--END .modal-body-->
+
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="c()">Save</button>
     <button type="button" class="btn btn-secondary" (click)="d()">Close</button>
-  </div>
-
+  </div><!--END .modal-footer-->
 
 </template>
 
-<button class="btn btn-primary" (click)="open()">Создать участок</button>
+
+
+
+<!--&lt;!&ndash;<div class="from-group row" *ngIf = "currentArea.type == 1">-->
+<!--<label class="col-4 col-form-label">Пусковой ток</label>-->
+<!--<div class="col-8">-->
+<!--<div class="input-group">-->
+<!--<input type="text" class="form-control" [(ngModel)]="currentArea.baseValue">-->
+<!--<span class="input-group-addon">А</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>&ndash;&gt;-->
+
+
+<!--</div>-->
+<!--</div>-->
+<!--&lt;!&ndash; 1 equal to EXPRESSION or INDEPENDENT&ndash;&gt;-->
+<!--<div *ngIf="currentArea.type == 2 ||currentArea.type == 3 ">-->
+
+<!--<div class="form-group">-->
+<!--<label>Диапазон участка </label>-->
+<!--<div class="form-group row">-->
+<!--<label class="col-2 col-form-label">начало</label>-->
+<!--<div class="col-4">-->
+<!--<div class="input-group">-->
+<!--<input type="text" class="form-control" [(ngModel)]="currentArea.xStart">-->
+<!--<span class="input-group-addon" id="basic-addon2">А</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--<label class="col-2 col-form-label">конец</label>-->
+<!--<div class="col-4">-->
+<!--<div class="input-group">-->
+<!--<input type="text" class="form-control" [(ngModel)]="currentArea.xEnd">-->
+<!--<span class="input-group-addon">А</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+
+
+
+
+
+
+
+
+
+<button class="btn btn-primary" (click)="open()">Создать ступень защиты</button>

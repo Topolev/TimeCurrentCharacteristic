@@ -1,18 +1,19 @@
 /**
  * Created by Vladimir on 22.03.2017.
  */
-
-import {Component, ElementRef, OnInit, ViewChild, AfterViewInit} from "@angular/core";
+import {Component, ElementRef, ViewChild, AfterViewInit} from "@angular/core";
 import CoordinatePlane from "./coordinate-panel/CoordinatePlane";
 import {ConfigCoordinatePanel, defaultConfig} from "./coordinate-panel/ConfigCoordinatePanel";
+import {Characteristic} from "./coordinate-panel/characteristic/Characteristic";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {CharacteristicComponent} from "./modal/characteristic.component";
 import {CharacteristicService} from "./modal/characteristic.service";
-import {Characteristic} from "./coordinate-panel/Characteristic";
+import {CharacteristicComponent} from "./modal/characteristic.component";
+import {BuilderStage} from "./coordinate-panel/classes/BuilderStage";
+import Stage from "./coordinate-panel/classes/Stage";
+import {defaultStageTemplates} from "./coordinate-panel/classes/StageTemplate";
 import {CurrentSlice} from "./coordinate-panel/CurrentSlice";
 import {defaultVoltageSteps} from "./coordinate-panel/VoltageSteps";
-
-
+declare var spline:any;
 
 @Component({
   selector: 'coordinate-plane',
@@ -33,14 +34,43 @@ export class CoordinatePlaneComponent implements AfterViewInit {
 
   config: ConfigCoordinatePanel;
 
+  builderStage: BuilderStage;
+
   constructor(private modalService: NgbModal,
               private chactericticService: CharacteristicService) {
+
+
     this.config = Object.assign({},defaultConfig);
+    this.builderStage = new BuilderStage();
+    /*var characteristic = new Characteristic();
+    var stage1: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[3], characteristic);
+    var stage2: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[2], characteristic);
+    var stage3: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[0], characteristic);
+    var stage4: Stage = this.builderStage.buildStageByTemplate(defaultStageTemplates[1], characteristic);
+
+    characteristic.stages.push(stage1);
+    characteristic.stages.push(stage2);
+    characteristic.stages.push(stage3);
+    characteristic.stages.push(stage4);
+
+    this.characteristics.push(characteristic);*/
+
     this.chactericticService.newCharacteristic$.subscribe(
       characteristic => {
         this.setCharacteristic(characteristic);
       }
     )
+  }
+
+  ngAfterViewInit() {
+    this.grid = new CoordinatePlane(this.canvas.nativeElement, this.canvasBack.nativeElement, this.config);
+    this.grid.addCharacteristics(this.characteristics);
+  }
+
+
+  openModalCreateOrEditCharacteristic(characterisctic: Characteristic) {
+    this.modalService.open(CharacteristicComponent, {windowClass: 'modal-create-new-graph'});
+    this.chactericticService.setCurrentCharacteristic(characterisctic);
   }
 
   setCharacteristic(newCharacteristic: Characteristic){
@@ -54,27 +84,8 @@ export class CoordinatePlaneComponent implements AfterViewInit {
     this.grid.addCharacteristics(this.characteristics);
   }
 
-  ngAfterViewInit() {
-    this.grid = new CoordinatePlane(this.canvas.nativeElement, this.canvasBack.nativeElement, this.config);
-    //katex.render("t = \\frac{0.14k}{(I/I_{sz})^{0,02}-1}", this.test.nativeElement)
-  }
-
-
-  addNewGraph() {
-    console.log("Add");
-  }
-
-  rerender() {
-    this.grid.render(this.config);
-  }
-
-  changeConfig(){
-    this.grid.updateConfigPanel();
-  }
-
-  openModal(characterisctic: Characteristic) {
-    this.modalService.open(CharacteristicComponent, {windowClass: 'modal-create-new-graph'});
-    this.chactericticService.setCurrentCharacteristic(characterisctic);
+  deleteCharacteristic(characteristic : Characteristic){
+    this.characteristics.splice(this.characteristics.indexOf(characteristic),1);
   }
 
   changeVisable(characteristic: Characteristic){
@@ -86,11 +97,6 @@ export class CoordinatePlaneComponent implements AfterViewInit {
     this.grid.addCurrentSlices(this.currentSlices);
   }
 
-
-  deleteCharacteristic(characteristic : Characteristic){
-    this.characteristics.splice(this.characteristics.indexOf(characteristic),1);
-  }
-
   addCurrentSlice(){
     this.currentSlices.push(new CurrentSlice());
     this.changeCurrentSlices();
@@ -100,6 +106,30 @@ export class CoordinatePlaneComponent implements AfterViewInit {
     this.currentSlices.splice(this.currentSlices.indexOf(currentSlice), 1);
     this.changeCurrentSlices();
   }
+
+  changeConfig(){
+    this.grid.updateConfigPanel();
+  }
+
+
+/*
+
+
+  rerender() {
+    this.grid.render(this.config);
+  }
+
+
+
+
+
+
+
+
+
+
+
+*/
 
 
 

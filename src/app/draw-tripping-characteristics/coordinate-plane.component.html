@@ -56,13 +56,17 @@
       </div>
     </div>
 
+
+
+
     <div class="col-md-6">
 
 
       <div class="block-parameters">
         <h1>Защитные характеристики</h1>
+
         <div class="wrap">
-          <button class="btn btn-inverse" (click)="openModal(null)">Создать характеристику</button>
+          <button class="btn btn-inverse" (click)="openModalCreateOrEditCharacteristic(null)">Создать характеристику</button>
           <div *ngIf="characteristics.length == 0">
             <div class="alert alert-warning" role="alert">
               Вы пока не создали ни одной защитной характеристики.
@@ -82,7 +86,7 @@
               </thead>
               <tbody>
               <tr *ngFor="let characteristic of characteristics">
-                <td>{{characteristic.label == undefined || characteristic.label.trim() ==''? 'без имени':
+                <td>{{characteristic.label == undefined || characteristic.label.trim() ==''? '&#60;без имени&#62;':
                   characteristic.label }}
                 </td>
                 <td>
@@ -97,7 +101,7 @@
                 </td>
                 <td>
                   <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-secondary btn-sm" (click)="openModal(characteristic)">
+                    <button type="button" class="btn btn-secondary btn-sm" (click)="openModalCreateOrEditCharacteristic(characteristic)">
                       &#9998;</button>
                     <button type="button" class="btn btn-secondary btn-sm"
                             (click)="deleteCharacteristic(characteristic)">
@@ -143,21 +147,6 @@
       </div>
 
     </div>
-  </div>
-
-
-  <div class="row">
-    <div class="col-md-6">
-
-    </div>
-
-
-  </div>
-
-
-  <div class="col">
-
-
   </div>
 </div>
 

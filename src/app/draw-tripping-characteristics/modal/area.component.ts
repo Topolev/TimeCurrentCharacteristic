@@ -1,11 +1,13 @@
-import {Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, OnInit} from '@angular/core';
-
-import {NgbModal, ModalDismissReasons, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {AreaTemplate, defaultAreaTemplates, Area} from "../coordinate-panel/area-template";
-import {Builder} from "selenium-webdriver";
-import {BuilderArea} from "../coordinate-panel/area-builder";
+import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from "@angular/core";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import Point from "../coordinate-panel/Point";
-import {PointsTemplate, defaultPointsTemplate} from "../coordinate-panel/PointsTemplate";
+import {PointsTemplate} from "../coordinate-panel/PointsTemplate";
+import {Characteristic} from "../coordinate-panel/characteristic/Characteristic";
+import {StageTemplate, defaultStageTemplates} from "../coordinate-panel/classes/StageTemplate";
+import {BuilderStage} from "../coordinate-panel/classes/BuilderStage";
+import Stage from "../coordinate-panel/classes/Stage";
+import PointsStage from "../coordinate-panel/classes/PointsStage";
+import PointsAbsStage from "../coordinate-panel/classes/PointsAbsStage";
 declare var jQuery: any;
 declare var katex: any;
 
@@ -16,81 +18,80 @@ declare var katex: any;
 })
 export class CreateNewArea {
 
-  builderArea: BuilderArea;
+  builderStage: BuilderStage;
 
-  selectedAreaTemplate: AreaTemplate;
-  selectedPointsTemplate: PointsTemplate = null;
+  selectedStageTemplate: StageTemplate;
 
-  areaTemplates: AreaTemplate[];
-  pointsTemplates: PointsTemplate[];
+  stageTemplates: StageTemplate[];
 
 
-  currentArea: Area;
+  currentStage: Stage;
   isEditMode: boolean = false;
-  idArea:number;
+  idStage:number;
   label:string;
 
   @ViewChild("content") content: ElementRef;
 
-  @Output() onNewArea = new EventEmitter<Area>();
-  @Output() onEditArea = new EventEmitter<Area>();
+  @Input() characteristic: Characteristic;
+  @Output() onNewStage = new EventEmitter<Stage>();
+  @Output() onEditStage = new EventEmitter<Stage>();
 
   constructor(
     private modalService: NgbModal) {
-    this.areaTemplates = defaultAreaTemplates;
-    this.pointsTemplates = defaultPointsTemplate;
-
-    this.builderArea = new BuilderArea();
+    this.stageTemplates = defaultStageTemplates;
+    this.builderStage = new BuilderStage();
   }
 
-  buildArea() {
-    this.currentArea = this.builderArea.buildAreaByTemplate(this.selectedAreaTemplate);
-    this.currentArea.id = this.idArea;
+  buildStage() {
+    this.currentStage = this.builderStage.buildStageByTemplate(this.selectedStageTemplate, this.characteristic);
+    this.currentStage.id = this.idStage;
+
+    console.log("Build ", this.currentStage);
   }
 
-  buildPointsTemplate(){
-    if (this.selectedPointsTemplate !=null) {
-      this.currentArea.points = this.selectedPointsTemplate.points.map(point => new Point(point.x, point.y));
-    } else{
-      this.currentArea.points = [];
-    }
-  }
 
-  findAreaTemplateById(id: number): AreaTemplate {
-    for (let areaTemplate of defaultAreaTemplates) {
-      if (areaTemplate.id === id) return areaTemplate;
+  findStageTemplateById(id: number): StageTemplate {
+    for (let stageTemplate of defaultStageTemplates) {
+      if (stageTemplate.id === id) return stageTemplate;
     }
     return null;
   }
 
   addPoint(){
     console.log("add point");
-    this.currentArea.points.push(new Point())
-  }
-  deletePoint(point:Point){
-    this.currentArea.points.splice(this.currentArea.points.indexOf(point),1);
+    console.log(this.currentStage);
+    (<PointsStage> this.currentStage).points.push(new Point())
   }
 
-  open(area: Area) {
-    if (area) {
+  deletePoint(point:Point){
+    (<PointsStage> this.currentStage).points.splice((<PointsAbsStage> this.currentStage).points.indexOf(point),1);
+  }
+
+  open(stage: Stage) {
+    console.log("OPEN CREATE STAGE");
+
+
+    if (stage) {
       this.isEditMode = true;
-      this.label = area.label;
-      this.idArea = area.id;
-      this.currentArea = area;
-      this.selectedAreaTemplate = area.areaTemplate;
-      this.selectedPointsTemplate = area.pointsTemplate;
+      this.label = stage.label;
+      this.idStage = stage.id;
+      this.currentStage = stage;
+      this.selectedStageTemplate = stage.stageTemplate;
     } else {
-      this.idArea = Date.now();
+      this.idStage = Date.now();
       this.isEditMode = false;
     }
+
+    console.log("Stage: ",this.currentStage);
+
     this.modalService.open(this.content).result.then(() => {
-      this.currentArea.label = this.label;
-      this.currentArea.areaTemplate = this.selectedAreaTemplate;
-      this.currentArea.pointsTemplate = this.selectedPointsTemplate;
+      this.currentStage.label = this.label;
+      this.currentStage.stageTemplate = this.selectedStageTemplate;
+      //this.currentArea.pointsTemplate = this.selectedPointsTemplate;
       if (this.isEditMode) {
-        this.onEditArea.emit(this.currentArea);
+        this.onEditStage.emit(this.currentStage);
       } else {
-        this.onNewArea.emit(this.currentArea);
+        this.onNewStage.emit(this.currentStage);
       }
       this.clearAllData();
     }, () => {
@@ -99,15 +100,10 @@ export class CreateNewArea {
   }
 
   clearAllData(){
-    this.selectedAreaTemplate = null;
+    this.selectedStageTemplate = null;
     this.label = "";
-    this.currentArea = null;
+    this.currentStage = null;
     jQuery('body').addClass('modal-open');
   }
-
-  renderFormulaForExpression(){
-
-  }
-
 
 }
